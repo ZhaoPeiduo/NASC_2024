@@ -1,47 +1,19 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi import WebSocket
+from pydantic import BaseModel
 
 app = FastAPI()
 
-html_content = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Chatbot</title>
-        <style>
-            #messages {
-                list-style-type: none;
-                margin: 0;
-                padding: 0;
-            }
-        </style>
-    </head>
-    <body>
-        <ul id="messages"></ul>
-        <input type="text" id="message" autocomplete="off" placeholder="Type your message here..."/>
-        <button id="send">Send</button>
-        <script>
-            var ws = new WebSocket("ws://localhost:8000/ws");
+class Options(BaseModel):
+    question: str
+    option1: str
+    option2: str
+    option3: str
+    option4: str
 
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages');
-                var message = document.createElement('li');
-                var content = document.createTextNode(event.data);
-                message.appendChild(content);
-                messages.appendChild(message);
-            };
-
-            document.getElementById('send').onclick = function() {
-                var input = document.getElementById('message');
-                var message = input.value;
-                ws.send(message);
-                input.value = '';
-            };
-        </script>
-    </body>
-</html>
-"""
+with open('./frontend.html', 'r') as file:
+    html_content = file.read()
 
 @app.get("/")
 async def get():
@@ -56,3 +28,18 @@ async def echo(websocket: WebSocket):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await echo(websocket)
+
+
+@app.post("/process-options")
+async def process_options(options: Options):
+    # Access the values
+    question = options.question
+    option1 = options.option1
+    option2 = options.option2
+    option3 = options.option3
+    option4 = options.option4
+
+    # Process the options here
+    # Return a response if needed
+    print({"question": question, "options": [option1, option2, option3, option4]})
+    

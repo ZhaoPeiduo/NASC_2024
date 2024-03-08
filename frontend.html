@@ -1,36 +1,80 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Chatbot</title>
-        <style>
-            #messages {
-                list-style-type: none;
-                margin: 0;
-                padding: 0;
-            }
-        </style>
-    </head>
-    <body>
-        <ul id="messages"></ul>
-        <input type="text" id="message" autocomplete="off" placeholder="Type your message here..."/>
-        <button id="send">Send</button>
-        <script>
-            var ws = new WebSocket("ws://localhost:8000/ws");
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Options</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Quiz Options</h2>
+        <label for="question">Enter Question:</label>
+        <input type="text" id="question" placeholder="Enter your question...">
+        <label for="option1">Option 1:</label>
+        <input type="text" id="option1" placeholder="Option 1...">
+        <label for="option2">Option 2:</label>
+        <input type="text" id="option2" placeholder="Option 2...">
+        <label for="option3">Option 3:</label>
+        <input type="text" id="option3" placeholder="Option 3...">
+        <label for="option4">Option 4:</label>
+        <input type="text" id="option4" placeholder="Option 4...">
+        <button onclick="submitOptions()">Submit</button>
+        <input type="text" id="output" readonly>
+    </div>
 
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages');
-                var message = document.createElement('li');
-                var content = document.createTextNode(event.data);
-                message.appendChild(content);
-                messages.appendChild(message);
-            };
+    <script>
+        function submitOptions() {
+            var question = document.getElementById("question").value;
+            var option1 = document.getElementById("option1").value;
+            var option2 = document.getElementById("option2").value;
+            var option3 = document.getElementById("option3").value;
+            var option4 = document.getElementById("option4").value;
 
-            document.getElementById('send').onclick = function() {
-                var input = document.getElementById('message');
-                var message = input.value;
-                ws.send(message);
-                input.value = '';
-            };
-        </script>
-    </body>
+            fetch('/process-options', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    question: question,
+                    option1: option1,
+                    option2: option2,
+                    option3: option3,
+                    option4: option4
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                document.getElementById("output").value = JSON.stringify(data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
 </html>
