@@ -2,8 +2,10 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi import WebSocket
 from pydantic import BaseModel
+from model import JapaneseLLM
 
 app = FastAPI()
+japanese_model = JapaneseLLM()
 
 class Options(BaseModel):
     question: str
@@ -38,8 +40,8 @@ async def process_options(options: Options):
     option2 = options.option2
     option3 = options.option3
     option4 = options.option4
+    options = [option1, option2, option3, option4]
+    options = [x for x in options  if len(options) > 0] # filter empty entries
 
-    # Process the options here
-    # Return a response if needed
-    print({"question": question, "options": [option1, option2, option3, option4]})
-    
+    explanation = japanese_model.generate_explanations(question, options)
+    return explanation
