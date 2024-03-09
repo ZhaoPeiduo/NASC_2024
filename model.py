@@ -56,7 +56,5 @@ class JapaneseLLM:
             do_sample=False,
         )
 
-        self.model.
-
         out = self.tokenizer.decode(tokens[0][input_ids.shape[1]:], skip_special_tokens=True).strip()
         return out
