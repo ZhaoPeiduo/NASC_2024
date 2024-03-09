@@ -6,13 +6,13 @@ class JapaneseLLM:
         self.tokenizer = AutoTokenizer.from_pretrained("stabilityai/japanese-stablelm-instruct-gamma-7b")
         self.model = AutoModelForCausalLM.from_pretrained(
             "stabilityai/japanese-stablelm-instruct-gamma-7b",
-            # torch_dtype=torch.half
+            torch_dtype=torch.half
         )
         self.model.eval()
         self.device= 'cpu'
-
-        # if torch.cuda.is_available():
-        #     self.model.to("cuda")
+        if torch.cuda.is_available():
+            self.device = 'cuda'
+        self.model.to(self.device)
 
     def build_prompt(self, user_query, inputs="", sep="\n\n### "):
         # sys_msg = "あなたは国語教師です。以下の問題を考え、正しい選択肢を説明してください。"
