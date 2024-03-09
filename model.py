@@ -50,10 +50,13 @@ class JapaneseLLM:
             input_ids.to(device=self.model.device),
             attention_mask=attention_mask, 
             max_new_tokens=64,
-            temperature=0.1,
+            # temperature=0.1,
             repetition_penalty=1.1,
             # top_p=0.95,
             do_sample=False,
         )
+
+        self.model.
+
         out = self.tokenizer.decode(tokens[0][input_ids.shape[1]:], skip_special_tokens=True).strip()
         return out
