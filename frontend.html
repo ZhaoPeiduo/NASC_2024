@@ -65,6 +65,7 @@
         <label for="option4">Option 4:</label>
         <input type="text" id="option4" placeholder="Option 4...">
         <button onclick="submitOptions()">Submit</button> 
+        <br>
         <textarea id="output" rows="4" cols="50" readonly></textarea>
     </div>
 
@@ -97,6 +98,21 @@
             .catch((error) => {
                 console.error('Error:', error);
             });
+        }
+
+        function startProgress() {
+            let progress = 0;
+            const progressBar = document.getElementById("progress");
+            const outputTextArea = document.getElementById("output");
+            const timer = setInterval(() => {
+                if (progress >= 100) {
+                    clearInterval(timer);
+                } else {
+                    progress += 10;
+                    progressBar.style.width = `${progress}%`;
+                    outputTextArea.value = `Progress: ${progress}%`; // Update text area with progress value
+                }
+            }, 1000);
         }
     </script>
 </body>
