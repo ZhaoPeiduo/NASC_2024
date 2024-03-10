@@ -1,11 +1,23 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi import WebSocket
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from model import JapaneseLLM
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
 japanese_model = JapaneseLLM()
+progress = 0
 
 class Options(BaseModel):
     question: str
@@ -34,6 +46,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.post("/process-options")
 async def process_options(options: Options):
+    update_progress(0)
     # Access the values
     question = options.question
     option1 = options.option1
@@ -42,6 +55,20 @@ async def process_options(options: Options):
     option4 = options.option4
     options = [option1, option2, option3, option4]
     options = [x for x in options  if len(options) > 0] # filter empty entries
+    update_progress(25)
 
-    explanation = japanese_model.generate_explanations(question, options)
+    answer = japanese_model.generate_answer(question, options)
+    update_progress(50)
+    explanation = japanese_model.generate_explanation(question, options, answer)
+    update_progress(100)
     return explanation
+
+@app.get("/progress")
+async def get_progress():
+    return {"progress": progress}
+
+@app.post("/progress")
+async def update_progress(new_progress: int):
+    global progress
+    progress = new_progress
+    return {"message": "Progress updated successfully"}

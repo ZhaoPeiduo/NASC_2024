@@ -8,7 +8,7 @@ This repository contains the model and user interface for Japanese Sensei as the
 
 Japanese Sensei aims to generate answers and explanations for the input Japanese grammar questions, by using pretrained Japanese LLM and prompt engineering to obtain the desired output from the model.
 
-### Setup
+### Requirement and Quick Start
 
 This solution was tested on a laptop with RTX4080 GPU, and will work optimally for other devices with compatible GPU resources.
 
@@ -27,8 +27,15 @@ and open the corresponding localhost as indicated by the logging INFO (the defau
 
 ### Model Specification
 
-Todo (stabilityai model currently with half precision)
+japanese-stablelm-instruct-gamma-7b by stabilityai with half precision is chosen as the LLM for this project.
+
+The half-precision model is able to fit within a laptop RTX4080 GPU, occupying approximately 11GB of GPU memory. 
 
 ### Prompt Engineering Methodlogy
 
-Todo
+The strategy is to use multi-step prompting 
+1. Appplying context specification by specifying the LLM as a Japanese teacher. 
+
+2. Applying the chain-of-thought:
+- Firstly, ask the LLM to make a choice among available option
+- Secondly, based on the previous answer, ask the LLM to explain the choice
