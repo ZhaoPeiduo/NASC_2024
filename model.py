@@ -27,7 +27,8 @@ class JapaneseLLM:
         return p
 
     def generate_answer(self, question, options):
-        question = question.replace("___", "[MASK]")
+        print("Generating answers...")
+        # question = question.replace("___", "[MASK]")
         user_inputs = {
             "user_query":'文法を基づいて、最もよい選択肢のアルファベットを一つ選びなさい。',
             "inputs": f"問題：{question} 選択肢：{options}"
@@ -47,17 +48,20 @@ class JapaneseLLM:
         tokens = self.model.generate(
             input_ids.to(device=self.model.device),
             attention_mask=attention_mask, 
-            max_new_tokens=64,
+            max_new_tokens=16,
             # temperature=0.1,
             repetition_penalty=1.1,
             # top_p=0.95,
             do_sample=False,
+            pad_token_id=2,
+            eos_token_id=2
         )
 
         answer = self.tokenizer.decode(tokens[0][input_ids.shape[1]:], skip_special_tokens=True).strip()
         return answer
         
     def generate_explanation(self, question, options, answer):
+        print("Generating explanations...")
         user_inputs = {
             "user_query":f'どうして{answer}選びましたか？',
             "inputs": f"問題：{question} 選択肢：{options}"
@@ -81,6 +85,8 @@ class JapaneseLLM:
             repetition_penalty=1.1,
             # top_p=0.95,
             do_sample=False,
+            pad_token_id=2,
+            eos_token_id=2
         )
 
         explanation = self.tokenizer.decode(tokens[0][input_ids.shape[1]:], skip_special_tokens=True).strip()

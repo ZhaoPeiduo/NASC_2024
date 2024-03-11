@@ -16,7 +16,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-japanese_model = JapaneseLLM()
 connections = set()
 progress = 0
 
@@ -40,16 +39,14 @@ async def reset_progress_and_send():
     progress = 0
     for connection in connections:
         await connection.send_json({"progress": 0, "reset": 1})
-    return 0
 
 async def update_progress_and_send(new_progress: int):
     global progress
-    for _ in range(new_progress):
+    for i in range(new_progress):
         progress += 1
         await sleep(0.1)
         for connection in connections:
             await connection.send_json({"progress": progress})
-    return 0
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -73,13 +70,11 @@ async def process_options(options: Options):
     options = [option1, option2, option3, option4]
     options = [x for x in options if len(x) > 0]  # filter empty entries
     await update_progress_and_send(25)
-
-    answer = japanese_model.generate_answer(question, options)  # Assuming generate_answer is defined elsewhere
+    print('25')
     await update_progress_and_send(50)
-
-    explanation = japanese_model.generate_explanation(question, options, answer)  # Assuming generate_explanation is defined elsewhere
+    print('75')
     await update_progress_and_send(25)
-    return explanation
+    print('100')
 
 @app.get("/progress")
 async def get_progress():
