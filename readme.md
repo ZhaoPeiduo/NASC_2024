@@ -2,6 +2,8 @@
 
 Team LLMers: Cao Han, Zhao Peiduo
 
+![Demo](./static/demo.jpg)
+
 This repository contains the model and user interface for Japanese Sensei as the entry for National AI Studen Challenge 2024. 
 
 ### Objective

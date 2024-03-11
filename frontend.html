@@ -11,7 +11,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            margin: 0; 
+            margin: 80px; 
             padding: 0; 
             font-family: Arial, sans-serif; 
             height: 100%;
@@ -21,6 +21,8 @@
             margin: 0 auto;
             padding: 20px;
             background-color: rgba(255, 255, 255, 0.8); 
+            position: relative; 
+            min-height: 100%;
         }
         input[type="text"] {
             width: 100%;
@@ -52,10 +54,21 @@
             width: 0%;
             border-radius: 5px;
         }
+
+        .loading {
+            height: 30px;
+            width: 30px;
+            display: none; /* Initially hide the loading GIF */
+        }
+
+        textarea {
+            resize: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <br>
         <h2>Quiz Options</h2>
         <label for="question">Enter Question:</label>
         <input type="text" id="question" placeholder="Enter your question...">
@@ -69,11 +82,13 @@
         <input type="text" id="option4" placeholder="Option 4...">
         <button id="submitBtn" onclick="submitOptions()">Submit</button> 
         <br>
-        <textarea id="output" rows="4" cols="50" readonly></textarea>
+        <textarea id="output" rows="6" cols="80" readonly></textarea>
         <br>
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar"></div>
         </div>
+        <img src="./static/load.gif" alt="Loading..." class="loading" id="loadingGif">
+        
     </div>
 
     <script>
@@ -92,7 +107,9 @@
         };
         
         function submitOptions() {
+            var loadgif = document.getElementById('loadingGif')
             var submitBtn = document.getElementById("submitBtn");
+            loadgif.style.display = 'block';
             submitBtn.disabled = "disabled";
 
             var question = document.getElementById("question").value;
@@ -119,10 +136,12 @@
                 console.log('Success:', data);
                 document.getElementById("output").value = JSON.stringify(data);
                 submitBtn.disabled = false;
+                loadgif.style.display = 'none';
             })
             .catch((error) => {
                 console.error('Error:', error);
                 submitBtn.disabled = false;
+                loadgif.style.display = 'none';
             });
         }
 
