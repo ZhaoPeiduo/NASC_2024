@@ -15,6 +15,9 @@
             padding: 0; 
             font-family: Arial, sans-serif; 
             height: 100%;
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; 
         }
         .container {
             max-width: 600px;
@@ -64,6 +67,24 @@
         textarea {
             resize: none;
         }
+
+        .upload-section {
+            margin-left: 20px; 
+        }
+
+        .upload-form {
+            display: flex; 
+            align-items: center; 
+        }
+
+        .upload-form input[type="file"] {
+            margin-right: 10px; 
+        }
+
+        canvas {
+            border: 2px solid black;
+            cursor: crosshair;
+        }
     </style>
 </head>
 <body>
@@ -88,7 +109,15 @@
             <div class="progress-bar" id="progress-bar"></div>
         </div>
         <img src="./static/load.gif" alt="Loading..." class="loading" id="loadingGif">
-        
+    </div>
+
+    <div class="upload-section">
+        <h2>Or Upload an Image of the Question!</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" id="imageUpload" accept="image/*" required>
+            <canvas id="imageCanvas"></canvas>
+            <button type="button" id="extractButton">Extract Text</button>
+        </form>
     </div>
 
     <script>
@@ -152,7 +181,134 @@
         function resetTextOutput() {
             document.getElementById('output').value = "";
         }
+    
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault(); 
 
+            var formData = new FormData();
+            var fileInput = document.getElementById('imageInput');
+            var threshold = document.getElementById("thresholdCheckbox").checked;
+
+            var selectedFile = fileInput.files[0];
+
+            if (selectedFile) {
+                var fileExtension = selectedFile.name.split('.').pop().toLowerCase();
+
+                if (['jpg', 'jpeg', 'png'].includes(fileExtension)) {
+                    formData.append('image', selectedFile);
+                    formData.append('threshold', threshold);
+
+
+                    fetch('/extract-text', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text();
+                        }
+                        throw new Error('Network response was not ok.');
+                    })
+                    .then(data => {
+                        console.log(data); 
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                } else {
+                    alert('Please upload a file with extension .jpg, .jpeg, or .png.');
+                }
+            } else {
+                alert('Please select a file to upload.');
+            }
+        });
+
+        let canvas, ctx, img;
+        let isDrawing = false;
+        let startX, startY, endX, endY;
+
+        document.getElementById('imageUpload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                displayImage(event.target.result);
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        function displayImage(imageData) {
+            canvas = document.getElementById('imageCanvas');
+            ctx = canvas.getContext('2d');
+            img = new Image();
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+            };
+            img.src = imageData;
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mouseup', endDrawing);
+            canvas.addEventListener('mousemove', drawRectangle);
+            document.getElementById('extractButton').addEventListener('click',extractText);
+        }
+
+        function startDrawing(event) {
+            isDrawing = true;
+            startX = event.offsetX;
+            startY = event.offsetY;
+        }
+
+        function endDrawing() {
+            isDrawing = false;
+        }
+
+        function drawRectangle(event) {
+            if (!isDrawing) return;
+            endX = event.offsetX;
+            endY = event.offsetY;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.rect(startX, startY, endX - startX, endY - startY);
+            ctx.stroke();
+        }
+
+        function extractText() {
+            const bbox = [startX, startY, endX, endY];
+            const canvasData = canvas.toDataURL(); 
+
+            const formData = new FormData();
+            formData.append('image_data', canvasData);
+            formData.append('x1', startX);
+            formData.append('y1', startY);
+            formData.append('x2', endX);
+            formData.append('y2', endY);
+
+            fetch('/extract-text/', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("question").value = data.suggested_question;
+
+                // Fill up the suggested options in the respective input fields
+                data.suggested_options.forEach((option, index) => {
+                    document.getElementById(`option${index + 1}`).value = option;
+                });
+
+                alert('Suggested question and options filled up.');
+            })
+            .catch(error => {
+                console.error('Error extracting text:', error);
+                alert('Error extracting text');
+            });
+        }
     </script>
 </body>
 </html>

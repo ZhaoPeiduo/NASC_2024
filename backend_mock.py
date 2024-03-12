@@ -1,10 +1,13 @@
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, File, UploadFile, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from model import JapaneseLLM
+from progress_manager import ProgressManager
 from asyncio import sleep
+import cv2
+import numpy as np
+
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -17,7 +20,7 @@ app.add_middleware(
 )
 
 connections = set()
-progress = 0
+manager = ProgressManager(connections)
 
 class Options(BaseModel):
     question: str
@@ -34,20 +37,6 @@ async def get():
     return HTMLResponse(content=html_content, status_code=200)
 
 
-async def reset_progress_and_send(): 
-    global progress
-    progress = 0
-    for connection in connections:
-        await connection.send_json({"progress": 0, "reset": 1})
-
-async def update_progress_and_send(new_progress: int):
-    global progress
-    for i in range(new_progress):
-        progress += 1
-        await sleep(0.1)
-        for connection in connections:
-            await connection.send_json({"progress": progress})
-
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -60,7 +49,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.post("/process-options")
 async def process_options(options: Options):
-    await reset_progress_and_send()
+    await manager.reset_progress_and_send()
     # Access the values
     question = options.question
     option1 = options.option1
@@ -69,13 +58,21 @@ async def process_options(options: Options):
     option4 = options.option4
     options = [option1, option2, option3, option4]
     options = [x for x in options if len(x) > 0]  # filter empty entries
-    await update_progress_and_send(25)
-    print('25')
-    await update_progress_and_send(50)
-    print('75')
-    await update_progress_and_send(25)
-    print('100')
+    await manager.update_progress_and_send(50)
+    await sleep(1)
+    await manager.update_progress_and_send(50)
+
+    return "test string"
+
+@app.post("/extract-text/")
+async def extract_text(image: UploadFile = File(...), threshold: bool = Form(False)):
+    image_data = await image.read()
+    nparr = np.frombuffer(image_data, np.uint8)
+    img_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    # Process the image data as needed
+    
+    return None
 
 @app.get("/progress")
 async def get_progress():
-    return {"progress": progress}
+    return {"progress": manager.progress}

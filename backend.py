@@ -1,11 +1,18 @@
-from fastapi import FastAPI, WebSocket
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, WebSocket, File, UploadFile, Form
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.requests import Request
+from starlette.templating import Jinja2Templates
 from pydantic import BaseModel
 from model import JapaneseLLM
 from progress_manager import ProgressManager
-
+import easyocr
+import numpy as np
+import cv2
+import os
+from PIL import Image, ImageDraw
+import base64
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -20,6 +27,7 @@ app.add_middleware(
 connections = set()
 manager = ProgressManager(connections)
 japanese_model = JapaneseLLM(manager)
+reader = easyocr.Reader(['ja'])
 
 class Options(BaseModel):
     question: str
@@ -28,12 +36,21 @@ class Options(BaseModel):
     option3: str
     option4: str
 
-with open('./frontend.html', 'r') as file:
-    html_content = file.read()
+# with open('./frontend.html', 'r') as file:
+#     html_content = file.read()
 
-@app.get("/")
-async def get():
-    return HTMLResponse(content=html_content, status_code=200)
+# @app.get("/")
+# async def get():
+#     return HTMLResponse(content=html_content, status_code=200)
+
+
+# Setup Jinja2 templates
+templates = Jinja2Templates(directory=".")
+
+# Serve the HTML file
+@app.get("/", response_class=HTMLResponse)
+async def read_form(request: Request):
+    return templates.TemplateResponse("frontend.html", {"request": request})
 
 
 @app.websocket("/ws")
@@ -67,3 +84,28 @@ async def process_options(options: Options):
 @app.get("/progress")
 async def get_progress():
     return {"progress": manager.progress}
+
+def extract_question_and_options(cropped, num_options=4):
+    result = reader.readtext(cropped)
+    result = [x[1] for x in result]
+    if len(result) < num_options + 1:
+        suggested_question = result[0]
+        suggested_options = result[1:]
+    else:
+        suggested_options = result[-num_options:]
+        suggested_question = ' '.join(result[:-num_options])
+    return suggested_question, suggested_options
+
+@app.post("/extract-text/")
+async def extract_text(image_data: str = Form(...), x1: int = Form(...), y1: int = Form(...), x2: int = Form(...), y2: int = Form(...)):
+    try:
+        _, encoded_data = image_data.split(',')
+        decoded_data = base64.b64decode(encoded_data)
+        image_array = np.frombuffer(decoded_data, np.uint8)
+        image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+        cropped = image[y1:y2, x1:x2]
+        suggested_question, suggested_options = extract_question_and_options(cropped)
+
+        return {"suggested_question": suggested_question, "suggested_options": suggested_options}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
