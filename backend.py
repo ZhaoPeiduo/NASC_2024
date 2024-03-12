@@ -74,10 +74,10 @@ async def process_options(options: Options):
     options = [x for x in options if len(x) > 0]  # filter empty entries
     await update_progress_and_send(25)
 
-    answer = japanese_model.generate_answer(question, options)  # Assuming generate_answer is defined elsewhere
+    answer = japanese_model.generate_answer(question, options) 
     await update_progress_and_send(50)
 
-    explanation = japanese_model.generate_explanation(question, options, answer)  # Assuming generate_explanation is defined elsewhere
+    explanation = japanese_model.generate_explanation(question, options, answer) 
     await update_progress_and_send(25)
     return explanation
 
