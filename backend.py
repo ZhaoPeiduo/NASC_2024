@@ -4,7 +4,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from model import JapaneseLLM
-from asyncio import sleep
+from progress_manager import ProgressManager
+
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -16,9 +17,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-japanese_model = JapaneseLLM()
 connections = set()
-progress = 0
+manager = ProgressManager(connections)
+japanese_model = JapaneseLLM(manager)
 
 class Options(BaseModel):
     question: str
@@ -35,22 +36,6 @@ async def get():
     return HTMLResponse(content=html_content, status_code=200)
 
 
-async def reset_progress_and_send(): 
-    global progress
-    progress = 0
-    for connection in connections:
-        await connection.send_json({"progress": 0, "reset": 1})
-    return 0
-
-async def update_progress_and_send(new_progress: int):
-    global progress
-    for _ in range(new_progress):
-        progress += 1
-        await sleep(0.1)
-        for connection in connections:
-            await connection.send_json({"progress": progress})
-    return 0
-
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -63,7 +48,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.post("/process-options")
 async def process_options(options: Options):
-    await reset_progress_and_send()
+    await manager.reset_progress_and_send()
     # Access the values
     question = options.question
     option1 = options.option1
@@ -72,15 +57,13 @@ async def process_options(options: Options):
     option4 = options.option4
     options = [option1, option2, option3, option4]
     options = [x for x in options if len(x) > 0]  # filter empty entries
-    await update_progress_and_send(25)
+    await manager.update_progress_and_send(10)
 
-    answer = japanese_model.generate_answer(question, options) 
-    await update_progress_and_send(50)
+    answer = await japanese_model.generate_answer(question, options) 
+    explanation = await japanese_model.generate_explanation(question, options, answer) 
 
-    explanation = japanese_model.generate_explanation(question, options, answer) 
-    await update_progress_and_send(25)
     return explanation
 
 @app.get("/progress")
 async def get_progress():
-    return {"progress": progress}
+    return {"progress": manager.progress}
