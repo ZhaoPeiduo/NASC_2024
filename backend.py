@@ -10,8 +10,6 @@ from progress_manager import ProgressManager
 import easyocr
 import numpy as np
 import cv2
-import os
-from PIL import Image, ImageDraw
 import base64
 
 app = FastAPI()
@@ -35,14 +33,6 @@ class Options(BaseModel):
     option2: str
     option3: str
     option4: str
-
-# with open('./frontend.html', 'r') as file:
-#     html_content = file.read()
-
-# @app.get("/")
-# async def get():
-#     return HTMLResponse(content=html_content, status_code=200)
-
 
 # Setup Jinja2 templates
 templates = Jinja2Templates(directory=".")

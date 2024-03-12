@@ -89,7 +89,6 @@
 </head>
 <body>
     <div class="container">
-        <br>
         <h2>Quiz Options</h2>
         <label for="question">Enter Question:</label>
         <input type="text" id="question" placeholder="Enter your question...">
@@ -112,10 +111,12 @@
     </div>
 
     <div class="upload-section">
-        <h2>Or Upload an Image of the Question!</h2>
+        <h2>Upload an Image of the Question!</h2>
         <form id="uploadForm" enctype="multipart/form-data">
             <input type="file" id="imageUpload" accept="image/*" required>
-            <canvas id="imageCanvas"></canvas>
+            <br>
+            <canvas id="imageCanvas", style="max-width: 100%; height: auto;"></canvas>
+            <br>
             <button type="button" id="extractButton">Extract Text</button>
         </form>
     </div>
@@ -181,47 +182,6 @@
         function resetTextOutput() {
             document.getElementById('output').value = "";
         }
-    
-        document.getElementById('uploadForm').addEventListener('submit', function(event) {
-            event.preventDefault(); 
-
-            var formData = new FormData();
-            var fileInput = document.getElementById('imageInput');
-            var threshold = document.getElementById("thresholdCheckbox").checked;
-
-            var selectedFile = fileInput.files[0];
-
-            if (selectedFile) {
-                var fileExtension = selectedFile.name.split('.').pop().toLowerCase();
-
-                if (['jpg', 'jpeg', 'png'].includes(fileExtension)) {
-                    formData.append('image', selectedFile);
-                    formData.append('threshold', threshold);
-
-
-                    fetch('/extract-text', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            return response.text();
-                        }
-                        throw new Error('Network response was not ok.');
-                    })
-                    .then(data => {
-                        console.log(data); 
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-                } else {
-                    alert('Please upload a file with extension .jpg, .jpeg, or .png.');
-                }
-            } else {
-                alert('Please select a file to upload.');
-            }
-        });
 
         let canvas, ctx, img;
         let isDrawing = false;
@@ -232,11 +192,39 @@
             const reader = new FileReader();
 
             reader.onload = function(event) {
-                displayImage(event.target.result);
+                const imageData = event.target.result;
+                resizeAndDisplayImage(imageData);
             };
 
             reader.readAsDataURL(file);
         });
+
+        function resizeAndDisplayImage(imageData) {
+            const MAX_WIDTH = 800; // Set the maximum width for the resized image
+            const img = new Image();
+
+            img.onload = function() {
+                // Calculate the scaled dimensions while preserving aspect ratio
+                let aspectRatio = img.width / img.height;
+                let newWidth = Math.min(img.width, MAX_WIDTH);
+                let newHeight = newWidth / aspectRatio;
+
+                // Create a temporary canvas to draw the resized image
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = newWidth;
+                tempCanvas.height = newHeight;
+                tempCtx.drawImage(img, 0, 0, newWidth, newHeight);
+
+                // Get the resized image data from the temporary canvas
+                const resizedImageData = tempCanvas.toDataURL('image/jpeg');
+
+                // Display the resized image on the canvas
+                displayImage(resizedImageData);
+            };
+
+            img.src = imageData;
+        }
 
         function displayImage(imageData) {
             canvas = document.getElementById('imageCanvas');
