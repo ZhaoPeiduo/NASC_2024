@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="./static/icon.jpg">
-    <title>Quiz Options</title>
+    <title>Japanese Sensei</title>
     <style>
         body {
             background-image: url('./static/background.jpg'); 
@@ -89,6 +89,7 @@
 </head>
 <body>
     <div class="container">
+        <br>
         <h2>Quiz Options</h2>
         <label for="question">Enter Question:</label>
         <input type="text" id="question" placeholder="Enter your question...">
@@ -182,7 +183,7 @@
         function resetTextOutput() {
             document.getElementById('output').value = "";
         }
-
+        
         let canvas, ctx, img;
         let isDrawing = false;
         let startX, startY, endX, endY;
@@ -192,61 +193,45 @@
             const reader = new FileReader();
 
             reader.onload = function(event) {
-                const imageData = event.target.result;
-                resizeAndDisplayImage(imageData);
+                displayImage(event.target.result);
             };
 
             reader.readAsDataURL(file);
         });
 
-        function resizeAndDisplayImage(imageData) {
-            const MAX_WIDTH = 800; // Set the maximum width for the resized image
-            const img = new Image();
-
-            img.onload = function() {
-                // Calculate the scaled dimensions while preserving aspect ratio
-                let aspectRatio = img.width / img.height;
-                let newWidth = Math.min(img.width, MAX_WIDTH);
-                let newHeight = newWidth / aspectRatio;
-
-                // Create a temporary canvas to draw the resized image
-                const tempCanvas = document.createElement('canvas');
-                const tempCtx = tempCanvas.getContext('2d');
-                tempCanvas.width = newWidth;
-                tempCanvas.height = newHeight;
-                tempCtx.drawImage(img, 0, 0, newWidth, newHeight);
-
-                // Get the resized image data from the temporary canvas
-                const resizedImageData = tempCanvas.toDataURL('image/jpeg');
-
-                // Display the resized image on the canvas
-                displayImage(resizedImageData);
-            };
-
-            img.src = imageData;
-        }
-
         function displayImage(imageData) {
+            const maxWidth = 800; // Maximum width for the displayed image
             canvas = document.getElementById('imageCanvas');
             ctx = canvas.getContext('2d');
             img = new Image();
             img.onload = function() {
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
+                let newWidth = img.width;
+                let newHeight = img.height;
+
+                // Check if the width exceeds the maximum
+                if (newWidth > maxWidth) {
+                    const scaleFactor = maxWidth / newWidth;
+                    newWidth *= scaleFactor;
+                    newHeight *= scaleFactor;
+                }
+
+                // Draw the resized image onto the canvas
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mouseup', endDrawing);
+                canvas.addEventListener('mousemove', drawRectangle);
+                document.getElementById('extractButton').addEventListener('click', extractText);
             };
             img.src = imageData;
-
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mouseup', endDrawing);
-            canvas.addEventListener('mousemove', drawRectangle);
-            document.getElementById('extractButton').addEventListener('click',extractText);
         }
 
         function startDrawing(event) {
             isDrawing = true;
-            startX = event.offsetX;
-            startY = event.offsetY;
+            startX = Math.floor(event.offsetX * img.width / canvas.width);
+            startY = Math.floor(event.offsetY * img.height / canvas.height);
         }
 
         function endDrawing() {
@@ -255,10 +240,11 @@
 
         function drawRectangle(event) {
             if (!isDrawing) return;
-            endX = event.offsetX;
-            endY = event.offsetY;
+            endX = Math.floor(event.offsetX * img.width / canvas.width);
+            endY = Math.floor(event.offsetY * img.height / canvas.height);
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 3;
             ctx.beginPath();
@@ -267,6 +253,7 @@
         }
 
         function extractText() {
+            // Use startX, startY, endX, endY for further processing
             const bbox = [startX, startY, endX, endY];
             const canvasData = canvas.toDataURL(); 
 
