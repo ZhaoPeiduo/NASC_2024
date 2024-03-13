@@ -12,7 +12,7 @@ Japanese Sensei aims to generate answers and explanations for the input Japanese
 
 ### Requirement and Quick Start
 
-This solution was tested on a laptop with RTX4080 GPU, and will work optimally for other devices with compatible GPU resources.
+This solution was written in Python 3.8.10, tested on a laptop with RTX4080 GPU, and will work optimally for other devices with compatible GPU resources.
 
 To install the dependencies, you may want to create a virtual environement (using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) for instance) and simply run: 
 
