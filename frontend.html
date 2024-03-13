@@ -259,12 +259,17 @@
             const bbox = [startX, startY, endX, endY];
             const canvasData = canvas.toDataURL(); 
 
+            // const resizedStartX = startX * canvas.width / canvas.clientWidth;
+            // const resizedStartY = startY * canvas.height / canvas.clientHeight;
+            // const resizedEndX = endX * canvas.width / canvas.clientWidth;
+            // const resizedEndY = endY * canvas.height / canvas.clientHeight;
+
             const formData = new FormData();
             formData.append('image_data', canvasData);
-            formData.append('x1', startX);
-            formData.append('y1', startY);
-            formData.append('x2', endX);
-            formData.append('y2', endY);
+            formData.append('x1', Math.round(startX));
+            formData.append('y1', Math.round(startY));
+            formData.append('x2', Math.round(endX));
+            formData.append('y2', Math.round(endY));
 
             fetch('/extract-text/', {
                 method: 'POST',
@@ -273,7 +278,6 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById("question").value = data.suggested_question;
-
                 // Fill up the suggested options in the respective input fields
                 data.suggested_options.forEach((option, index) => {
                     document.getElementById(`option${index + 1}`).value = option;

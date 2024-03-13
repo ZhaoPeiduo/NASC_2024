@@ -93,6 +93,7 @@ async def extract_text(image_data: str = Form(...), x1: int = Form(...), y1: int
         decoded_data = base64.b64decode(encoded_data)
         image_array = np.frombuffer(decoded_data, np.uint8)
         image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+        
         cropped = image[y1:y2, x1:x2]
         suggested_question, suggested_options = extract_question_and_options(cropped)
 
