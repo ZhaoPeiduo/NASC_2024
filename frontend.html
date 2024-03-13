@@ -112,11 +112,11 @@
     </div>
 
     <div class="upload-section">
-        <h2>Upload an Image of the Question!</h2>
+        <h2>Or Upload an Image of the Question!</h2>
         <form id="uploadForm" enctype="multipart/form-data">
             <input type="file" id="imageUpload" accept="image/*" required>
             <br>
-            <canvas id="imageCanvas", style="max-width: 100%; height: auto;"></canvas>
+            <canvas id="imageCanvas"></canvas>
             <br>
             <button type="button" id="extractButton">Extract Text</button>
         </form>
@@ -183,7 +183,7 @@
         function resetTextOutput() {
             document.getElementById('output').value = "";
         }
-        
+
         let canvas, ctx, img;
         let isDrawing = false;
         let startX, startY, endX, endY;
@@ -200,38 +200,26 @@
         });
 
         function displayImage(imageData) {
-            const maxWidth = 800; // Maximum width for the displayed image
             canvas = document.getElementById('imageCanvas');
             ctx = canvas.getContext('2d');
             img = new Image();
             img.onload = function() {
-                let newWidth = img.width;
-                let newHeight = img.height;
-
-                // Check if the width exceeds the maximum
-                if (newWidth > maxWidth) {
-                    const scaleFactor = maxWidth / newWidth;
-                    newWidth *= scaleFactor;
-                    newHeight *= scaleFactor;
-                }
-
-                // Draw the resized image onto the canvas
-                canvas.width = newWidth;
-                canvas.height = newHeight;
-                ctx.drawImage(img, 0, 0, newWidth, newHeight);
-
-                canvas.addEventListener('mousedown', startDrawing);
-                canvas.addEventListener('mouseup', endDrawing);
-                canvas.addEventListener('mousemove', drawRectangle);
-                document.getElementById('extractButton').addEventListener('click', extractText);
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
             };
             img.src = imageData;
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mouseup', endDrawing);
+            canvas.addEventListener('mousemove', drawRectangle);
+            document.getElementById('extractButton').addEventListener('click',extractText);
         }
 
         function startDrawing(event) {
             isDrawing = true;
-            startX = Math.floor(event.offsetX * img.width / canvas.width);
-            startY = Math.floor(event.offsetY * img.height / canvas.height);
+            startX = event.offsetX;
+            startY = event.offsetY;
         }
 
         function endDrawing() {
@@ -240,11 +228,10 @@
 
         function drawRectangle(event) {
             if (!isDrawing) return;
-            endX = Math.floor(event.offsetX * img.width / canvas.width);
-            endY = Math.floor(event.offsetY * img.height / canvas.height);
-
+            endX = event.offsetX;
+            endY = event.offsetY;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 3;
             ctx.beginPath();
@@ -253,7 +240,6 @@
         }
 
         function extractText() {
-            // Use startX, startY, endX, endY for further processing
             const bbox = [startX, startY, endX, endY];
             const canvasData = canvas.toDataURL(); 
 
