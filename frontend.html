@@ -11,28 +11,35 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            margin: 80px; 
+            margin: 0; 
             padding: 0; 
             font-family: Arial, sans-serif; 
-            height: 100%;
             display: flex; 
-            justify-content: center; 
+            justify-content: space-between; /* Distribute items evenly along the main axis */
             align-items: flex-start; 
         }
+    
         .container {
-            max-width: 600px;
-            margin: 0 auto;
+            width: 50%; /* 50% of the page width */
             padding: 20px;
-            background-color: rgba(255, 255, 255, 0.8); 
             position: relative; 
-            min-height: 100%;
+            min-height: 100vh; /* Minimum height to fill the viewport */
         }
+    
+        .upload-section {
+            width: 50%; /* 50% of the page width */
+            padding: 20px;
+            position: relative; 
+            min-height: 100vh; /* Minimum height to fill the viewport */
+        }
+    
         input[type="text"] {
-            width: 100%;
+            width: calc(100% - 16px); /* Adjust for padding */
             margin-bottom: 10px;
             padding: 8px;
             box-sizing: border-box;
         }
+    
         button {
             padding: 10px 20px;
             background-color: #007bff;
@@ -40,52 +47,61 @@
             border: none;
             cursor: pointer;
         }
+    
         button:hover {
             background-color: #0056b3;
         }
-        
+    
         .progress-container {
-            width: 50%; 
+            width: 50%; /* 50% of the page width */
             background-color: #f5f5f5; 
             border-radius: 5px; 
             margin-bottom: 20px; 
         }
-
+    
         .progress-bar {
             height: 30px;
             background-color: #4caf50; 
             width: 0%;
             border-radius: 5px;
         }
-
+    
         .loading {
             height: 30px;
             width: 30px;
             display: none; /* Initially hide the loading GIF */
         }
-
+    
         textarea {
+            width: 100%;
             resize: none;
         }
-
+    
         .upload-section {
             margin-left: 20px; 
         }
-
+    
         .upload-form {
             display: flex; 
             align-items: center; 
         }
-
+    
         .upload-form input[type="file"] {
             margin-right: 10px; 
         }
-
+    
         canvas {
             border: 2px solid black;
             cursor: crosshair;
+            max-width: 100%;
+            height: auto;
+        }
+    
+        #output {
+            width: 100%;
         }
     </style>
+    
 </head>
 <body>
     <div class="container">
@@ -218,8 +234,8 @@
 
         function startDrawing(event) {
             isDrawing = true;
-            startX = event.offsetX;
-            startY = event.offsetY;
+            startX = event.offsetX * canvas.width / canvas.clientWidth;
+            startY = event.offsetY * canvas.height / canvas.clientHeight;
         }
 
         function endDrawing() {
@@ -228,8 +244,8 @@
 
         function drawRectangle(event) {
             if (!isDrawing) return;
-            endX = event.offsetX;
-            endY = event.offsetY;
+            endX = event.offsetX * canvas.width / canvas.clientWidth;
+            endY = event.offsetY * canvas.height / canvas.clientHeight;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(img, 0, 0);
             ctx.strokeStyle = 'red';
