@@ -1,7 +1,17 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-class StableLM_Gamma_7b_Half:
+class JapaneseLLMTemplate:
+    def __init__(self):
+        raise NotImplementedError("This is an interface class for further Model subclasses and shall not be initialized.")
+    
+    def build_prompt(self, question, options):
+        raise NotImplementedError("This is an interface class for further Model subclasses and method is not implemented.")
+    
+    def generate_answer(self, question, options):
+        raise NotImplementedError("This is an interface class for further Model subclasses and method is not implemented.")
+
+class StableLM_Gamma_7b_Half(JapaneseLLMTemplate):
     def __init__(self):
         self.tokenizer = AutoTokenizer.from_pretrained("stabilityai/japanese-stablelm-instruct-gamma-7b")
         self.model = AutoModelForCausalLM.from_pretrained(
@@ -90,7 +100,7 @@ class StableLM_Gamma_7b_Half:
         explanation = self.tokenizer.decode(tokens[0][input_ids.shape[1]:], skip_special_tokens=True).strip()
         return f'{answer}　説明：{explanation}'
 
-class ELYZA_Llama_7b_Half:
+class ELYZA_Llama_7b_Half(JapaneseLLMTemplate):
     def __init__(self):
         self.tokenizer = AutoTokenizer.from_pretrained("elyza/ELYZA-japanese-Llama-2-7b-instruct")
         self.model = AutoModelForCausalLM.from_pretrained("elyza/ELYZA-japanese-Llama-2-7b-instruct", torch_dtype=torch.half)
@@ -103,8 +113,8 @@ class ELYZA_Llama_7b_Half:
     def build_prompt(self, question, options):
         B_INST, E_INST = "[INST]", "[/INST]"
         B_SYS, E_SYS = "<<SYS>>\n", "\n<</SYS>>\n\n"
-        DEFAULT_SYSTEM_PROMPT = "あなたは国語教師です。以下の問題を考えて、要求を適切に満たす応答を書きなさい。"
-        text = f"文法を基づいて、最もよい選択肢のアルファベットを一つ選びなさい。問題：{question} 選択肢：{options}"
+        DEFAULT_SYSTEM_PROMPT = "あなたは国語教師です。文法を基づいて、最もよい選択肢のアルファベットを一つだけ選びなさい"
+        text = f"問題：{question} 選択肢：{options}"
         prompt = f"{self.tokenizer.bos_token}{B_INST}{B_SYS}{DEFAULT_SYSTEM_PROMPT}{E_SYS}{text}{E_INST}"
         return prompt
     
@@ -116,14 +126,15 @@ class ELYZA_Llama_7b_Half:
 
             output_ids = self.model.generate(
                 token_ids.to(self.model.device),
-                max_new_tokens=16,
+                max_new_tokens=64,
                 pad_token_id=self.tokenizer.pad_token_id,
                 eos_token_id=self.tokenizer.eos_token_id,
+                repetition_penalty=1.1
             )
         output = self.tokenizer.decode(output_ids.tolist()[0][token_ids.size(1) :], skip_special_tokens=True)
         return output
         
-class GPT_NeoX_4b:
+class GPT_NeoX_4b(JapaneseLLMTemplate):
     def __init__(self):
         self.tokenizer = AutoTokenizer.from_pretrained("rinna/japanese-gpt-neox-3.6b-instruction-sft", use_fast=False)
         self.model = AutoModelForCausalLM.from_pretrained("rinna/japanese-gpt-neox-3.6b-instruction-sft")
@@ -156,6 +167,7 @@ class GPT_NeoX_4b:
             + "<NL>"
             + "システム: "
         )
+        return prompt
     
     def generate_answer(self, question, options):
         prompt = self.build_prompt(question, options)
@@ -165,7 +177,7 @@ class GPT_NeoX_4b:
             output_ids = self.model.generate(
                 token_ids.to(self.model.device),
                 do_sample=False,
-                max_new_tokens=16,
+                max_new_tokens=32,
                 pad_token_id=self.tokenizer.pad_token_id,
                 bos_token_id=self.tokenizer.bos_token_id,
                 eos_token_id=self.tokenizer.eos_token_id
@@ -173,4 +185,4 @@ class GPT_NeoX_4b:
 
         output = self.tokenizer.decode(output_ids.tolist()[0][token_ids.size(1):])
         output = output.replace("<NL>", "\n")
-        
+        return output
