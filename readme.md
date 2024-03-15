@@ -1,4 +1,4 @@
-## Leveraging Large Language Model(LLM) to explain multiple-choice questions for JLPT preparation
+## LLM Sensei: Leveraging Large Language Model(LLM) to explain multiple-choice questions for JLPT preparation
 
 Team LLMers: Cao Han, Zhao Peiduo
 
