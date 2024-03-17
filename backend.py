@@ -75,7 +75,7 @@ async def process_options(options: Options):
 async def get_progress():
     return {"progress": manager.progress}
 
-def extract_question_and_options(cropped, num_options=4):
+def extract_question_and_options(cropped, num_options=3):
     result = reader.readtext(cropped)
     result = [x[1] for x in result]
     if len(result) < num_options + 1:
@@ -87,7 +87,7 @@ def extract_question_and_options(cropped, num_options=4):
     return suggested_question, suggested_options
 
 @app.post("/extract-text/")
-async def extract_text(image_data: str = Form(...), x1: int = Form(...), y1: int = Form(...), x2: int = Form(...), y2: int = Form(...)):
+async def extract_text(image_data: str = Form(...), x1: int = Form(...), y1: int = Form(...), x2: int = Form(...), y2: int = Form(...), num_options: int = Form(...)):
     try:
         _, encoded_data = image_data.split(',')
         decoded_data = base64.b64decode(encoded_data)
@@ -95,7 +95,7 @@ async def extract_text(image_data: str = Form(...), x1: int = Form(...), y1: int
         image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
         
         cropped = image[y1:y2, x1:x2]
-        suggested_question, suggested_options = extract_question_and_options(cropped)
+        suggested_question, suggested_options = extract_question_and_options(cropped, num_options=num_options)
 
         return {"suggested_question": suggested_question, "suggested_options": suggested_options}
     except Exception as e:

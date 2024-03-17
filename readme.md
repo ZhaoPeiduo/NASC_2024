@@ -1,14 +1,14 @@
 ## LLM Sensei: Leveraging Large Language Model(LLM) to explain multiple-choice questions for JLPT preparation
 
-Team LLMers: Cao Han, Zhao Peiduo
+By Team LLMers: Cao Han, Zhao Peiduo
 
-![Demo](./static/demo_v2.jpg)
+![Demo](./static/demo.jpg)
 
-This repository contains the model and user interface for Japanese Sensei as the entry for National AI Student Challenge 2024. 
+This repository contains the model and user interface for LLM Sensei as the entry for National AI Student Challenge 2024. 
 
 ### Objective
 
-Japanese Sensei aims to generate answers and explanations for the input Japanese grammar questions, by using pretrained Japanese LLM and prompt engineering to obtain the desired output from the model.
+LLM Sensei aims to generate answers and explanations for the input Japanese grammar questions, by using pretrained Japanese LLM and prompt engineering to obtain the desired output from the model.
 
 ### Requirement and Quick Start
 
@@ -33,11 +33,18 @@ japanese-stablelm-instruct-gamma-7b by stabilityai with half precision is chosen
 
 The half-precision model is able to fit within a laptop RTX4080 GPU, occupying approximately 11GB of GPU memory. 
 
+Dataset used for evaluation and other candidate models can be found under the Evaluation directory. 
+
 ### Prompt Engineering Methodlogy
 
 The strategy is to use multi-step prompting 
-1. Appplying context specification by specifying the LLM as a Japanese teacher. 
+1. Appplying context specification by stating that the LLM should act as a Japanese teacher. 
 
-2. Applying the chain-of-thought:
-- Firstly, ask the LLM to make a choice among available option
-- Secondly, based on the previous answer, ask the LLM to explain the choice
+2. Provide clear instruction for the LLM to indicate the correct answer clearly.
+
+3. Applying the chain-of-thought:
+- Firstly, ask the LLM to make a choice among available option;
+- Secondly, based on the previous answer, ask the LLM to explain the choice.
+
+### Poster
+![Poster](./static/poster.jpg)

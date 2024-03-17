@@ -130,6 +130,8 @@
     <div class="upload-section">
         <h2>Or Upload an Image of the Question!</h2>
         <form id="uploadForm" enctype="multipart/form-data">
+            <label for="numOptions">Number of Options:</label>
+            <input type="number" id="numOptions" min="2" max="4" value="4" required>
             <input type="file" id="imageUpload" accept="image/*" required>
             <br>
             <canvas id="imageCanvas"></canvas>
@@ -258,11 +260,7 @@
         function extractText() {
             const bbox = [startX, startY, endX, endY];
             const canvasData = canvas.toDataURL(); 
-
-            // const resizedStartX = startX * canvas.width / canvas.clientWidth;
-            // const resizedStartY = startY * canvas.height / canvas.clientHeight;
-            // const resizedEndX = endX * canvas.width / canvas.clientWidth;
-            // const resizedEndY = endY * canvas.height / canvas.clientHeight;
+            const numOptions = document.getElementById("numOptions").value;
 
             const formData = new FormData();
             formData.append('image_data', canvasData);
@@ -270,6 +268,7 @@
             formData.append('y1', Math.round(startY));
             formData.append('x2', Math.round(endX));
             formData.append('y2', Math.round(endY));
+            formData.append('num_options', numOptions);
 
             fetch('/extract-text/', {
                 method: 'POST',
