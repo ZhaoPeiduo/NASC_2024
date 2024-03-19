@@ -29,7 +29,7 @@ and open the corresponding localhost as indicated by the logging INFO (the defau
 
 ### Model Specification
 
-japanese-stablelm-instruct-gamma-7b by stabilityai with half precision is chosen as the LLM for this project.
+After comparing three candidate models, japanese-stablelm-instruct-gamma-7b by stabilityai with half precision is chosen as the LLM backend for this project.
 
 The half-precision model is able to fit within a laptop RTX4080 GPU, occupying approximately 11GB of GPU memory. 
 
