@@ -27,6 +27,12 @@ uvicorn backend:app --reload
 
 and open the corresponding localhost as indicated by the logging INFO (the default should be http://127.0.0.1:8000).
 
+### Workflow
+
+The workflow of LLM sensei is represented by the following flow chart:
+
+![Workflow](./static/workflow.png)
+
 ### Model Specification
 
 After comparing three candidate models, japanese-stablelm-instruct-gamma-7b by stabilityai with half precision is chosen as the LLM backend for this project.
