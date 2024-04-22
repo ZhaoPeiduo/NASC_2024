@@ -4,7 +4,7 @@ By Team LLMers: Cao Han, Zhao Peiduo
 
 ![Demo](./static/demo.jpg)
 
-This repository contains the model and user interface for LLM Sensei as the entry for National AI Student Challenge 2024. 
+This repository contains the model and user interface for LLM Sensei as the entry for National AI Student Challenge 2024, which has been selected as one of the finalist projects.
 
 ### Objective
 
