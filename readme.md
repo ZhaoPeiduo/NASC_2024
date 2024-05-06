@@ -4,7 +4,7 @@ By Team LLMers: Cao Han, Zhao Peiduo
 
 ![Demo](./static/demo.jpg)
 
-This repository contains the model and user interface for LLM Sensei as the entry for National AI Student Challenge 2024. 
+This repository contains the model and user interface for LLM Sensei as the entry for National AI Student Challenge 2024, which has been selected as one of the finalist projects.
 
 ### Objective
 
@@ -26,6 +26,12 @@ uvicorn backend:app --reload
 ```
 
 and open the corresponding localhost as indicated by the logging INFO (the default should be http://127.0.0.1:8000).
+
+### Workflow
+
+The workflow of LLM sensei is represented by the following flow chart:
+
+![Workflow](./static/workflow.png)
 
 ### Model Specification
 
