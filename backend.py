@@ -34,6 +34,14 @@ class Options(BaseModel):
     option3: str
     option4: str
 
+class OptionsWithAnswer(BaseModel):
+    question: str
+    option1: str
+    option2: str
+    option3: str
+    option4: str
+    answer: str
+
 # Setup Jinja2 templates
 templates = Jinja2Templates(directory=".")
 
@@ -53,8 +61,8 @@ async def websocket_endpoint(websocket: WebSocket):
     finally:
         connections.remove(websocket)
 
-@app.post("/process-options")
-async def process_options(options: Options):
+@app.post("/reterieve_answer")
+async def reterieve_answer(options: Options):
     await manager.reset_progress_and_send()
     # Access the values
     question = options.question
@@ -67,8 +75,18 @@ async def process_options(options: Options):
     await manager.update_progress_and_send(10)
 
     answer = await japanese_model.generate_answer(question, options) 
-    explanation = await japanese_model.generate_explanation(question, options, answer) 
+    return answer
 
+@app.post("/retrieve_explanation")
+async def retrieve_explanation(options_ans:OptionsWithAnswer):
+    question = options_ans.question
+    option1 = options_ans.option1
+    option2 = options_ans.option2
+    option3 = options_ans.option3
+    option4 = options_ans.option4
+    answer = options_ans.answer
+    options = [option1, option2, option3, option4]
+    explanation = await japanese_model.generate_explanation(question, options, answer) 
     return explanation
 
 @app.get("/progress")

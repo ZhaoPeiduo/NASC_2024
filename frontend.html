@@ -119,8 +119,11 @@
         <input type="text" id="option4" placeholder="Option 4...">
         <button id="submitBtn" onclick="submitOptions()">Submit</button> 
         <br>
-        <textarea id="output" rows="6" cols="80" readonly></textarea>
+        <label for="answer">Answer:</label>
+        <textarea id="answer" rows="1" cols="80" readonly></textarea>
         <br>
+        <label for="explanation">Explanation:</label>
+        <textarea id="explanation" rows="4" cols="80" readonly></textarea>
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar"></div>
         </div>
@@ -156,7 +159,7 @@
         };
         
         function submitOptions() {
-            var loadgif = document.getElementById('loadingGif')
+            var loadgif = document.getElementById('loadingGif');
             var submitBtn = document.getElementById("submitBtn");
             loadgif.style.display = 'block';
             submitBtn.disabled = "disabled";
@@ -167,7 +170,7 @@
             var option3 = document.getElementById("option3").value;
             var option4 = document.getElementById("option4").value;
 
-            fetch('/process-options', {
+            fetch('/reterieve_answer', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -183,7 +186,10 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
-                document.getElementById("output").value = JSON.stringify(data);
+                document.getElementById("answer").value = JSON.stringify(data).replace('\n', '<br>').replace('"', '');
+                return retrieveExplanation(data);
+            })
+            .then(() => {
                 submitBtn.disabled = false;
                 loadgif.style.display = 'none';
             })
@@ -194,12 +200,51 @@
             });
         }
 
+        function retrieveExplanation(data) {
+    
+            var question = document.getElementById("question").value;
+            var option1 = document.getElementById("option1").value;
+            var option2 = document.getElementById("option2").value;
+            var option3 = document.getElementById("option3").value;
+            var option4 = document.getElementById("option4").value;
+            
+            request_body = {
+                    question: question,
+                    option1: option1,
+                    option2: option2,
+                    option3: option3,
+                    option4: option4,
+                    answer: data
+                }
+            
+            return new Promise((resolve, reject) => {
+                fetch('/retrieve_explanation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(request_body)
+                })
+                .then(response => response.json())
+                .then(explanationData => {
+                    console.log('Explanation:', explanationData);
+                    document.getElementById("explanation").value = explanationData;
+                    resolve();
+                })
+                .catch((error) => {
+                    console.error('Error retrieving explanation:', error);
+                    reject(error); // Reject the promise with the error
+                });
+            });
+        }
+
         function updateProgress(progress) {
             document.getElementById('progress-bar').style.width = progress + '%';
         }
 
         function resetTextOutput() {
-            document.getElementById('output').value = "";
+            document.getElementById('answer').value = "";
+            document.getElementById('explanation').value = "";
         }
 
         let canvas, ctx, img;

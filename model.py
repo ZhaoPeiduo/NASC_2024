@@ -49,11 +49,12 @@ class JapaneseLLM:
 
         attention_mask = torch.ones_like(input_ids).to(self.device)  # Create attention mask with all 1s for non-padding tokens
         await self.manager.update_progress_and_send(5)
+        max_length = max([len(x) for x in options])
 
         tokens = self.model.generate(
             input_ids.to(device=self.model.device),
             attention_mask=attention_mask, 
-            max_new_tokens=16,
+            max_new_tokens=max_length+4,
             # temperature=0.1,
             repetition_penalty=1.1,
             # top_p=0.95,
@@ -99,5 +100,5 @@ class JapaneseLLM:
 
         explanation = self.tokenizer.decode(tokens[0][input_ids.shape[1]:], skip_special_tokens=True).strip()
         await self.manager.update_progress_and_send(20)
-        return f'{answer}　説明：{explanation}'
+        return f'説明：{explanation}'
 
