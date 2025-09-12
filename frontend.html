@@ -166,19 +166,143 @@
       .row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       .small { font-size: 12px; color: var(--muted); }
     </style>
-    <!-- React via CDN -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- React via CDN (primary: unpkg, with runtime fallbacks) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script>
+      // Fallback loader if CDNs are blocked
+      (function () {
+        function add(src, cb) {
+          var s = document.createElement('script');
+          s.src = src; s.async = true; s.onload = cb; document.head.appendChild(s);
+        }
+        function ensureReact(cb) {
+          if (window.React && window.ReactDOM) return cb();
+          add('https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js', function () {
+            add('https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js', cb);
+          });
+        }
+        function ensureBabel(cb) {
+          if (window.Babel) return cb();
+          add('https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js', cb);
+        }
+        setTimeout(function(){ ensureReact(function(){ ensureBabel(function(){}); }); }, 200);
+      })();
+    </script>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="text/babel">
+    <!-- Pre-rendered skeleton so something is visible even before React mounts -->
+    <div id="root">
+      <div class="page">
+        <div>
+          <div class="card">
+            <div class="title">Quiz Options</div>
+            <div class="subtle">Loading UI… If this persists, scripts may be blocked.</div>
+            <label>Question</label>
+            <input type="text" placeholder="Enter your question..." />
+            <div class="row">
+              <div>
+                <label>Option 1</label>
+                <input type="text" placeholder="Option 1..." />
+              </div>
+              <div>
+                <label>Option 2</label>
+                <input type="text" placeholder="Option 2..." />
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <label>Option 3</label>
+                <input type="text" placeholder="Option 3..." />
+              </div>
+              <div>
+                <label>Option 4</label>
+                <input type="text" placeholder="Option 4..." />
+              </div>
+            </div>
+            <div class="actions">
+              <button disabled>Submit</button>
+              <span class="small">Initializing…</span>
+            </div>
+            <label>Answer</label>
+            <input type="text" readOnly value="" />
+            <label>Explanation</label>
+            <textarea rows="5" readOnly></textarea>
+          </div>
+          <div class="progress">
+            <div class="progressbar"><div style="width: 0%"></div></div>
+            <div class="progressline">
+              <div>Idle</div>
+              <div>0%</div>
+            </div>
+            <div class="steps">
+              <span class="chip active">Idle</span>
+              <span class="chip">Answering</span>
+              <span class="chip">Explaining</span>
+              <span class="chip">Done</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="title">Or Upload an Image</div>
+            <div class="subtle">Draw a rectangle around the question and options.</div>
+            <div class="row-3">
+              <div>
+                <label>Options Count</label>
+                <input type="number" min="2" max="4" value="4" />
+              </div>
+              <div style="grid-column: span 2">
+                <label>Upload Image</label>
+                <input type="file" accept="image/*" />
+              </div>
+            </div>
+            <div class="spacer"></div>
+            <canvas></canvas>
+            <div class="actions">
+              <button disabled>Extract Text</button>
+              <span class="small">Initializing…</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Show an error banner if CDNs are blocked and React doesn't mount soon.
+      (function () {
+        function showBanner(msg) {
+          var b = document.createElement('div');
+          b.style.position = 'fixed';
+          b.style.left = '0';
+          b.style.right = '0';
+          b.style.bottom = '0';
+          b.style.padding = '10px 14px';
+          b.style.background = '#fee2e2';
+          b.style.color = '#991b1b';
+          b.style.borderTop = '1px solid #fecaca';
+          b.style.font = '12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif';
+          b.textContent = msg;
+          document.body.appendChild(b);
+        }
+        setTimeout(function () {
+          if (!window.React || !window.ReactDOM) {
+            showBanner('React libraries failed to load. Check your internet or CDN blocking.');
+            return;
+          }
+          var root = document.getElementById('root');
+          if (!root || root.childNodes.length === 0) {
+            showBanner('UI did not mount. Please hard refresh (Ctrl+Shift+R).');
+          }
+        }, 1500);
+      })();
+    </script>
+    <script type="text/babel" data-presets="env,react">
       const { useEffect, useRef, useState } = React;
 
       function Progress({ progress, phase }) {
-        // Normalize backend's ~0..80 to 0..100 for UX
-        const normalized = Math.min(100, Math.round((progress / 80) * 100));
+        // Backend typically reaches ~80; normalize visually to 100
+        const normalized = Math.min(100, Math.max(0, Math.round((progress / 80) * 100)));
         const steps = [
           { key: 'idle', label: 'Idle' },
           { key: 'answer', label: 'Answering' },
@@ -384,10 +508,9 @@
               const data = JSON.parse(ev.data);
               if (typeof data.progress === 'number') {
                 setProgress(data.progress);
-                // Phase heuristic based on backend progress buckets
+                // Phase heuristic aligned to backend increments (~80 total)
                 if (data.progress < 10) setPhase('Idle');
-                else if (data.progress < 30) setPhase('Answering');
-                else if (data.progress < 70) setPhase('Answering');
+                else if (data.progress < 40) setPhase('Answering');
                 else if (data.progress < 80) setPhase('Explaining');
                 else setPhase('Done');
               }

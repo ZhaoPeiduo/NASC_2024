@@ -1,5 +1,5 @@
 from fastapi import FastAPI, WebSocket, File, UploadFile, Form
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.requests import Request
@@ -42,13 +42,18 @@ class OptionsWithAnswer(BaseModel):
     option4: str
     answer: str
 
-# Setup Jinja2 templates
+# Setup Jinja2 templates (kept for backward compatibility; not used by React UI)
 templates = Jinja2Templates(directory=".")
 
-# Serve the HTML file
+# Serve the React SPA as a static HTML file to avoid Jinja parsing React's {{ }}
 @app.get("/", response_class=HTMLResponse)
-async def read_form(request: Request):
-    return templates.TemplateResponse("frontend.html", {"request": request})
+async def read_form():
+    return FileResponse("frontend.html", media_type="text/html")
+
+# Optional: serve a favicon to avoid 404 logs
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse("static/icon.jpg")
 
 
 @app.websocket("/ws")
