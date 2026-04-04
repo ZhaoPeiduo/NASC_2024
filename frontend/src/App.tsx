@@ -3,10 +3,8 @@ import { AuthProvider } from "./contexts/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import Layout from "./components/Layout";
 import PracticePage from "./pages/PracticePage";
-
-function PlaceholderPage({ name }: { name: string }) {
-  return <div className="text-slate-400 text-center py-20">{name} — coming soon</div>;
-}
+import HistoryPage from "./pages/HistoryPage";
+import StatsPage from "./pages/StatsPage";
 
 export default function App() {
   return (
@@ -15,8 +13,8 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/practice" element={<Layout><PracticePage /></Layout>} />
-          <Route path="/history" element={<Layout><PlaceholderPage name="History" /></Layout>} />
-          <Route path="/stats" element={<Layout><PlaceholderPage name="Stats" /></Layout>} />
+          <Route path="/history" element={<Layout><HistoryPage /></Layout>} />
+          <Route path="/stats" element={<Layout><StatsPage /></Layout>} />
           <Route path="*" element={<Navigate to="/practice" replace />} />
         </Routes>
       </AuthProvider>
