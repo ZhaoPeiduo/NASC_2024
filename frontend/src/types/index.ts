@@ -1,0 +1,40 @@
+export type Phase = "idle" | "answering" | "explaining" | "done";
+
+export interface SolveResult {
+  answer: string;
+  explanation: string;
+  wrong_options: Record<string, string>;
+  concepts: string[];
+}
+
+export interface AttemptResponse {
+  id: number;
+  question_text: string;
+  correct_answer: string;
+  llm_answer: string;
+  user_marked_correct: boolean;
+  concepts: string[];
+  created_at: string;
+}
+
+export interface StatsResponse {
+  total_attempts: number;
+  correct_rate: number;
+  weak_concepts: string[];
+  study_days: number;
+}
+
+export interface VideoRecommendation {
+  title: string;
+  video_id: string;
+  thumbnail_url: string;
+  channel_title: string;
+}
+
+export interface GeneratedQuestion {
+  question: string;
+  options: string[];
+  correct_answer: string;
+  explanation: string;
+  concepts: string[];
+}
