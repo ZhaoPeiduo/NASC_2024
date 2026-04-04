@@ -1,9 +1,9 @@
-import type { SolveResult } from "../types";
+import type { Phase, SolveResult } from "../types";
 
 export default function ExplanationCard({
   streamText, result, phase
 }: {
-  streamText: string; result: SolveResult | null; phase: string;
+  streamText: string; result: SolveResult | null; phase: Phase;
 }) {
   if (phase === "idle") return null;
 
