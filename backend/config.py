@@ -1,4 +1,5 @@
-from pydantic_settings import BaseSettings
+from pydantic import SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Literal
 
 class Settings(BaseSettings):
@@ -13,7 +14,7 @@ class Settings(BaseSettings):
     local_model_name: str = "stabilityai/japanese-stablelm-instruct-gamma-7b"
 
     # Auth
-    secret_key: str = "change-me-in-production"
+    secret_key: SecretStr = SecretStr("dev-secret-change-in-production-!!!")
     access_token_expire_minutes: int = 60 * 24 * 7  # 1 week
 
     # Database
@@ -23,9 +24,8 @@ class Settings(BaseSettings):
     youtube_api_key: str = ""
 
     # CORS
-    allowed_origins: list[str] = ["http://localhost:5173", "http://localhost:8000"]
+    allowed_origins: list[str] = ["http://localhost:5173"]
 
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(env_file=".env")
 
 settings = Settings()

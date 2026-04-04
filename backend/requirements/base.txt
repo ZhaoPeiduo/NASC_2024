@@ -5,8 +5,9 @@ sse-starlette==2.1.0
 sqlalchemy[asyncio]==2.0.35
 aiosqlite==0.20.0
 alembic==1.13.2
-python-jose[cryptography]==3.3.0
+authlib==1.3.2
 passlib[bcrypt]==1.7.4
+bcrypt==4.1.3
 python-multipart==0.0.9
 pydantic-settings==2.4.0
 easyocr==1.7.1
