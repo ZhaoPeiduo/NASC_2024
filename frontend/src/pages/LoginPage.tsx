@@ -9,19 +9,26 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const switchMode = (m: "login" | "register") => {
+    setMode(m);
+    setError("");
+    setEmail("");
+    setPassword("");
+  };
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    setError(""); setLoading(true);
+    setError(""); setSubmitting(true);
     try {
       if (mode === "login") await login(email, password);
       else await register(email, password);
       navigate("/practice");
-    } catch (err: any) {
-      setError(err.message ?? "Something went wrong");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -34,7 +41,7 @@ export default function LoginPage() {
         <div className="flex gap-2 mb-6">
           {(["login", "register"] as const).map(m => (
             <button key={m}
-              onClick={() => setMode(m)}
+              onClick={() => switchMode(m)}
               className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors
                 ${mode === m ? "bg-brand-500 text-white" : "bg-slate-100 text-slate-600"}`}
             >
@@ -57,10 +64,10 @@ export default function LoginPage() {
             />
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
-          <button type="submit" disabled={loading}
+          <button type="submit" disabled={submitting}
             className="w-full bg-brand-500 hover:bg-brand-700 text-white py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50"
           >
-            {loading ? "Please wait…" : mode === "login" ? "Sign In" : "Create Account"}
+            {submitting ? "Please wait…" : mode === "login" ? "Sign In" : "Create Account"}
           </button>
         </form>
       </div>
