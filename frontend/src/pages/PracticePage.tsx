@@ -2,6 +2,7 @@ import { useQuizSession } from "../hooks/useQuizSession";
 import QuizForm from "../components/QuizForm";
 import ExplanationCard from "../components/ExplanationCard";
 import StreamingProgress from "../components/StreamingProgress";
+import ImageExtractor from "../components/ImageExtractor";
 
 export default function PracticePage() {
   const {
@@ -9,6 +10,10 @@ export default function PracticePage() {
     phase, streamText, result, error,
     submit, reset,
   } = useQuizSession();
+
+  const fillFromImage = (question: string, options: string[]) => {
+    setFields({ question, options: [...options, "", "", "", ""].slice(0, 4) });
+  };
 
   return (
     <div>
@@ -23,6 +28,7 @@ export default function PracticePage() {
         disabled={phase !== "idle" && phase !== "done"}
         error={error}
       />
+      <ImageExtractor onExtract={fillFromImage} />
       <StreamingProgress phase={phase} />
       <ExplanationCard streamText={streamText} result={result} phase={phase} />
     </div>
