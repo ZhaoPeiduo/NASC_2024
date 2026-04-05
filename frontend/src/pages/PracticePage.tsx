@@ -3,6 +3,7 @@ import QuizForm from "../components/QuizForm";
 import ExplanationCard from "../components/ExplanationCard";
 import StreamingProgress from "../components/StreamingProgress";
 import ImageExtractor from "../components/ImageExtractor";
+import RecommendationPanel from "../components/RecommendationPanel";
 
 export default function PracticePage() {
   const {
@@ -31,6 +32,7 @@ export default function PracticePage() {
       <ImageExtractor onExtract={fillFromImage} />
       <StreamingProgress phase={phase} />
       <ExplanationCard streamText={streamText} result={result} phase={phase} />
+      {result && <RecommendationPanel concepts={result.concepts} />}
     </div>
   );
 }
