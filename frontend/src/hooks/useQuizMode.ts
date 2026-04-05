@@ -24,6 +24,7 @@ export function useQuizMode() {
   const [analyses, setAnalyses] = useState<AnalysisItem[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const answersRef = useRef<QuizAnswer[]>([]);
 
   const stopTimer = () => {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
@@ -75,17 +76,20 @@ export function useQuizMode() {
     setScreen("active");
   }, []);
 
+  const finishedRef = useRef(false);
+
   // Countdown timer
   useEffect(() => {
     if (screen !== "active" || timeLimitSec === 0) return;
+    finishedRef.current = false;
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
         if (t <= 1) {
-          // time's up — finish with current answers
-          setAnswers(prev => {
-            finishQuiz(prev);
-            return prev;
-          });
+          if (!finishedRef.current) {
+            finishedRef.current = true;
+            // Schedule finishQuiz outside the updater to avoid side effects in setState
+            setTimeout(() => finishQuiz(answersRef.current), 0);
+          }
           return 0;
         }
         return t - 1;
@@ -108,6 +112,7 @@ export function useQuizMode() {
       options: q.options,
     };
     const newAnswers = [...answers, newAnswer];
+    answersRef.current = newAnswers;
     setAnswers(newAnswers);
     setSelected(null);
 
@@ -124,6 +129,7 @@ export function useQuizMode() {
     setQuestions([]);
     setCurrent(0);
     setSelected(null);
+    answersRef.current = [];
     setAnswers([]);
     setAnalyses([]);
   };
