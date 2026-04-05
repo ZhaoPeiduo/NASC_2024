@@ -48,7 +48,7 @@ export default function QuizSetup({ onStart }: Props) {
         onDragOver={e => e.preventDefault()}
         onClick={() => inputRef.current?.click()}
         className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center cursor-pointer
-          hover:border-brand-500 transition-colors active:scale-99"
+          hover:border-brand-500 transition-colors active:scale-[0.99]"
       >
         <input ref={inputRef} type="file" accept=".csv" className="hidden"
           onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
@@ -78,12 +78,14 @@ export default function QuizSetup({ onStart }: Props) {
           </div>
           <div className="flex items-center gap-2">
             <button onClick={() => setMinutes(m => Math.max(0, m - 5))}
+              aria-label="Decrease time limit"
               className="w-7 h-7 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50
                 active:scale-95 transition-all text-sm flex items-center justify-center">−</button>
             <span className="text-sm font-semibold text-slate-800 w-12 text-center">
               {minutes === 0 ? "∞" : `${minutes}m`}
             </span>
             <button onClick={() => setMinutes(m => m + 5)}
+              aria-label="Increase time limit"
               className="w-7 h-7 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50
                 active:scale-95 transition-all text-sm flex items-center justify-center">+</button>
           </div>
@@ -97,6 +99,9 @@ export default function QuizSetup({ onStart }: Props) {
           </div>
           <button
             onClick={() => setIncludeHistory(v => !v)}
+            role="switch"
+            aria-checked={includeHistory}
+            aria-label="Mix in wrong history from past attempts"
             className={`relative w-10 h-5 rounded-full transition-colors ${includeHistory ? "bg-brand-500" : "bg-slate-200"}`}
           >
             <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform
@@ -109,10 +114,12 @@ export default function QuizSetup({ onStart }: Props) {
             <p className="text-xs text-slate-500">How many wrong questions to add</p>
             <div className="flex items-center gap-2">
               <button onClick={() => setHistoryCount(n => Math.max(1, n - 1))}
+                aria-label="Decrease history question count"
                 className="w-6 h-6 rounded border border-slate-200 text-xs text-slate-500
                   hover:bg-slate-50 active:scale-95 transition-all">−</button>
               <span className="text-sm font-semibold text-slate-800 w-6 text-center">{historyCount}</span>
               <button onClick={() => setHistoryCount(n => Math.min(20, n + 1))}
+                aria-label="Increase history question count"
                 className="w-6 h-6 rounded border border-slate-200 text-xs text-slate-500
                   hover:bg-slate-50 active:scale-95 transition-all">+</button>
             </div>
@@ -123,7 +130,7 @@ export default function QuizSetup({ onStart }: Props) {
       <button
         disabled={questions.length === 0}
         onClick={() => onStart(questions, minutes * 60)}
-        className="w-full bg-brand-500 hover:bg-brand-600 active:scale-98 text-white py-2.5 rounded-xl
+        className="w-full bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white py-2.5 rounded-xl
           font-semibold text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {questions.length > 0 ? `Start Quiz — ${questions.length} questions` : "Upload CSV to start"}

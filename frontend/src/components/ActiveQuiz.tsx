@@ -72,7 +72,7 @@ export default function ActiveQuiz({
               key={letter}
               onClick={() => onSelect(letter)}
               className={`w-full text-left p-3 rounded-xl border text-sm transition-all
-                active:scale-99 font-medium
+                active:scale-[0.99] font-medium
                 ${isSelected
                   ? "border-brand-500 bg-brand-50 text-brand-700 shadow-sm"
                   : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
@@ -87,7 +87,7 @@ export default function ActiveQuiz({
       <button
         onClick={onConfirm}
         disabled={!selected}
-        className="w-full bg-brand-500 hover:bg-brand-600 active:scale-98 text-white py-2.5
+        className="w-full bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white py-2.5
           rounded-xl font-semibold text-sm transition-all disabled:opacity-40"
       >
         {questionNumber === totalQuestions ? "Finish Quiz" : "Next →"}
