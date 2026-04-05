@@ -23,12 +23,8 @@ def parse_grammar_csv(content: str) -> list[dict]:
         if not question:
             continue
         opts_raw = row.get("Options", "").strip()
-        parts = re.split(r"\s+(?=[a-d]\.)", opts_raw)
-        options = []
-        for part in parts:
-            m = re.match(r"^([a-d])\.(.+)$", part.strip())
-            if m:
-                options.append(f"{m.group(1).upper()}: {m.group(2).strip()}")
+        matches = re.findall(r"([a-d])\.(.+?)(?=\s[a-d]\.|$)", opts_raw)
+        options = [f"{letter.upper()}: {text.strip()}" for letter, text in matches]
         if not options:
             continue
         answer = row.get("Answer", "").strip().upper()
@@ -90,11 +86,13 @@ async def analyze_wrong_answers(
     )
 
     raw = await provider.complete(prompt)
-    match = re.search(r"\[.*\]", raw, re.DOTALL)
+    match = re.search(r"\[.*?\]", raw, re.DOTALL)
     parsed: list[dict] = []
     if match:
         try:
-            parsed = json.loads(match.group(0))
+            candidate = json.loads(match.group(0))
+            if isinstance(candidate, list):
+                parsed = candidate
         except json.JSONDecodeError:
             parsed = []
 
