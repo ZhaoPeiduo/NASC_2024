@@ -11,6 +11,7 @@ from backend.routers import auth as auth_router
 from backend.routers import quiz as quiz_router
 from backend.routers import history as history_router
 from backend.routers import advanced as advanced_router
+from backend.routers import practice as practice_router
 
 
 @asynccontextmanager
@@ -33,6 +34,7 @@ app.include_router(auth_router.router)
 app.include_router(quiz_router.router)
 app.include_router(history_router.router)
 app.include_router(advanced_router.router)
+app.include_router(practice_router.router)
 
 
 @app.get("/health/live")

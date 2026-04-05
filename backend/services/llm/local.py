@@ -68,3 +68,8 @@ class LocalModelProvider(LLMProvider):
         )
         data = json.loads(text.strip())
         return GeneratedQuestion(**data)
+
+    async def complete(self, prompt: str) -> str:
+        return await asyncio.get_event_loop().run_in_executor(
+            None, self._generate_sync, prompt, 1000
+        )

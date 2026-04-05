@@ -1,21 +1,21 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import AsyncIterator
 
 
 @dataclass
 class SolveResult:
-    answer: str                       # "A", "B", "C", or "D"
-    explanation: str                  # Why the correct answer is right
-    wrong_options: dict[str, str]     # {"B": "why B is wrong", ...}
-    concepts: list[str]               # ["て-form", "conditional"]
+    answer: str
+    explanation: str
+    wrong_options: dict[str, str]
+    concepts: list[str]
 
 
 @dataclass
 class GeneratedQuestion:
     question: str
-    options: list[str]                # ["A: ...", "B: ...", "C: ...", "D: ..."]
-    correct_answer: str               # "A"/"B"/"C"/"D"
+    options: list[str]
+    correct_answer: str
     explanation: str
     concepts: list[str]
 
@@ -27,9 +27,7 @@ class LLMProvider(ABC):
         question: str,
         options: list[str],
     ) -> AsyncIterator[str]:
-        """Yield raw text tokens. Final token sequence includes a JSON block:
-        <RESULT>{"answer":"A","explanation":"...","wrong_options":{...},"concepts":[...]}</RESULT>
-        """
+        """Yield raw text tokens ending with <RESULT>{json}</RESULT>."""
         ...
 
     @abstractmethod
@@ -39,4 +37,9 @@ class LLMProvider(ABC):
         level: str,
     ) -> GeneratedQuestion:
         """Return a fully formed question with answer and explanation."""
+        ...
+
+    @abstractmethod
+    async def complete(self, prompt: str) -> str:
+        """Non-streaming completion for structured tasks (analysis, recommendations)."""
         ...

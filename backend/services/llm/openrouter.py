@@ -79,3 +79,10 @@ class OpenRouterProvider(LLMProvider):
             full += token
         data = json.loads(full.strip())
         return GeneratedQuestion(**data)
+
+    async def complete(self, prompt: str) -> str:
+        messages = [{"role": "user", "content": prompt}]
+        full = ""
+        async for token in self._stream_chat(messages):
+            full += token
+        return full
