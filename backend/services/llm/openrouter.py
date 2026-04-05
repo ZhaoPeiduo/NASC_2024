@@ -85,4 +85,6 @@ class OpenRouterProvider(LLMProvider):
         full = ""
         async for token in self._stream_chat(messages):
             full += token
+        if not full:
+            raise ValueError("LLM provider returned empty response")
         return full
