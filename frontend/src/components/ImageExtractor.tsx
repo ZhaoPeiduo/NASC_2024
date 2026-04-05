@@ -1,4 +1,4 @@
-import { useRef, useState, type MouseEvent, type TouchEvent } from "react";
+import { useRef, useState, useEffect, type MouseEvent, type TouchEvent } from "react";
 
 interface Rect { x1: number; y1: number; x2: number; y2: number; }
 interface Props { onExtract: (question: string, options: string[]) => void; }
@@ -16,6 +16,7 @@ function canvasCoords(
 
 export default function ImageExtractor({ onExtract }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
   const [imageData, setImageData] = useState<string | null>(null);
   const [selection, setSelection] = useState<Rect | null>(null);
   const [drawing, setDrawing] = useState(false);
@@ -30,11 +31,8 @@ export default function ImageExtractor({ onExtract }: Props) {
       const src = e.target!.result as string;
       const img = new Image();
       img.onload = () => {
-        const canvas = canvasRef.current!;
-        canvas.width = img.width;
-        canvas.height = img.height;
-        canvas.getContext("2d")!.drawImage(img, 0, 0);
-        setImageData(src);
+        imgRef.current = img;
+        setImageData(src);   // triggers re-render → canvas mounts → useEffect draws
         setSelection(null);
       };
       img.src = src;
@@ -42,11 +40,19 @@ export default function ImageExtractor({ onExtract }: Props) {
     reader.readAsDataURL(file);
   };
 
+  // Draw image after canvas mounts (canvas only exists once imageData is set)
+  useEffect(() => {
+    if (!imageData || !canvasRef.current || !imgRef.current) return;
+    const canvas = canvasRef.current;
+    canvas.width = imgRef.current.width;
+    canvas.height = imgRef.current.height;
+    canvas.getContext("2d")!.drawImage(imgRef.current, 0, 0);
+  }, [imageData]);
+
   const redraw = (rect: Rect) => {
-    if (!imageData || !canvasRef.current) return;
+    if (!imgRef.current || !canvasRef.current) return;
     const ctx = canvasRef.current.getContext("2d")!;
-    const img = new Image(); img.src = imageData;
-    ctx.drawImage(img, 0, 0);
+    ctx.drawImage(imgRef.current, 0, 0);
     ctx.strokeStyle = "#0ea5e9"; ctx.lineWidth = 2;
     ctx.strokeRect(rect.x1, rect.y1, rect.x2 - rect.x1, rect.y2 - rect.y1);
     ctx.fillStyle = "rgba(14,165,233,0.1)";
@@ -148,7 +154,7 @@ export default function ImageExtractor({ onExtract }: Props) {
             </select>
             <button onClick={extract} disabled={!selection || loading}
               className="flex-1 bg-brand-500 text-white text-sm py-2 rounded-lg disabled:opacity-40 transition-colors">
-              {loading ? "Extracting\u2026" : "Extract Text"}
+              {loading ? "Extracting…" : "Extract Text"}
             </button>
           </div>
           {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
