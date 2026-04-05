@@ -92,4 +92,45 @@ export const api = {
       { concept, level },
       true
     ),
+
+  uploadPracticeCSV: (
+    file: File,
+    includeHistory: boolean,
+    historyCount: number
+  ) => {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("include_history", String(includeHistory));
+    form.append("history_count", String(historyCount));
+    return fetch(`${BASE}/api/v1/practice/upload`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: form,
+    }).then(async r => {
+      if (!r.ok) { const e = await r.json().catch(() => ({ detail: "Upload failed" })); throw new Error(e.detail); }
+      return r.json() as Promise<{ questions: import("../types").QuizQuestion[]; total: number }>;
+    });
+  },
+
+  analyzePractice: (wrongItems: {
+    question: string; options: string[]; correct_answer: string; user_answer: string;
+  }[]) =>
+    post<{ analyses: import("../types").AnalysisItem[] }>(
+      "/api/v1/practice/analyze",
+      { wrong_items: wrongItems },
+      true
+    ),
+
+  recordBatch: (attempts: {
+    question_text: string; options: string[]; correct_answer: string;
+    user_answer: string; user_marked_correct: boolean;
+  }[]) =>
+    post("/api/v1/practice/record-batch", { attempts }, true),
+
+  getMediaRecommendations: (concept: string) =>
+    post<import("../types").MediaRecommendResponse>(
+      "/api/v1/recommendations/media",
+      { concept },
+      true
+    ),
 };

@@ -38,3 +38,23 @@ export interface GeneratedQuestion {
   explanation: string;
   concepts: string[];
 }
+
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  correct_answer: string;
+  from_history?: boolean;
+}
+
+export interface AnalysisItem {
+  question: string;
+  correct_answer: string;
+  user_answer: string;
+  explanation: string;
+}
+
+export interface MediaRecommendResponse {
+  songs: { title: string; artist: string }[];
+  anime: { title: string; scene: string }[];
+  articles: { title: string; keywords: string }[];
+}
