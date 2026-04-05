@@ -24,15 +24,29 @@ async def get_media_recommendations(concept: str, provider: LLMProvider) -> dict
     prompt = MEDIA_PROMPT.format(concept=concept)
     raw = await provider.complete(prompt)
 
-    match = re.search(r"\{.*\}", raw, re.DOTALL)
-    if not match:
+    # Try direct parse first, then regex fallback
+    def _extract(text: str) -> dict | None:
+        try:
+            data = json.loads(text.strip())
+            if isinstance(data, dict):
+                return data
+        except json.JSONDecodeError:
+            pass
+        match = re.search(r"\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}", text, re.DOTALL)
+        if match:
+            try:
+                data = json.loads(match.group(0))
+                if isinstance(data, dict):
+                    return data
+            except json.JSONDecodeError:
+                pass
+        return None
+
+    data = _extract(raw)
+    if data is None:
         return {"songs": [], "anime": [], "articles": []}
-    try:
-        data = json.loads(match.group(0))
-        return {
-            "songs":    data.get("songs", []),
-            "anime":    data.get("anime", []),
-            "articles": data.get("articles", []),
-        }
-    except json.JSONDecodeError:
-        return {"songs": [], "anime": [], "articles": []}
+    return {
+        "songs":    data.get("songs", []),
+        "anime":    data.get("anime", []),
+        "articles": data.get("articles", []),
+    }
