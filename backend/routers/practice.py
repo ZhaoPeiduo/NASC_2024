@@ -71,7 +71,7 @@ async def record_batch(
             question_text=item.question_text,
             options=item.options,
             correct_answer=item.correct_answer,
-            llm_answer=item.user_answer,
+            llm_answer=item.user_answer,  # quiz mode: user's choice stored here (no LLM answer)
             explanation="",
             concepts=[],
             user_marked_correct=item.user_marked_correct,

@@ -41,6 +41,8 @@ export default function QuizResults({ score, total, analyses, analyzing, onRetry
                 <div key={i} className="h-16 bg-slate-100 rounded-xl animate-timer-pulse" />
               ))}
             </div>
+          ) : analyses.length === 0 ? (
+            <p className="text-xs text-slate-400 italic">Analysis unavailable</p>
           ) : (
             analyses.map((item, i) => (
               <div key={i} className="bg-white border border-red-100 rounded-xl p-3 space-y-2 animate-slide-in"
