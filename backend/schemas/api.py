@@ -70,3 +70,74 @@ class VideoRecommendation(BaseModel):
     video_id: str
     thumbnail_url: str
     channel_title: str
+
+
+class PracticeQuestion(BaseModel):
+    question: str
+    options: list[str]
+    correct_answer: str
+    from_history: bool = False
+
+
+class UploadPracticeResponse(BaseModel):
+    questions: list[PracticeQuestion]
+    total: int
+
+
+class WrongItem(BaseModel):
+    question: str
+    options: list[str]
+    correct_answer: str
+    user_answer: str
+
+
+class AnalysisItem(BaseModel):
+    question: str
+    correct_answer: str
+    user_answer: str
+    explanation: str
+
+
+class AnalyzeRequest(BaseModel):
+    wrong_items: list[WrongItem]
+
+
+class AnalyzeResponse(BaseModel):
+    analyses: list[AnalysisItem]
+
+
+class BatchAttemptItem(BaseModel):
+    question_text: str
+    options: list[str]
+    correct_answer: str
+    user_answer: str
+    user_marked_correct: bool
+
+
+class BatchRecordRequest(BaseModel):
+    attempts: list[BatchAttemptItem]
+
+
+class MediaRecommendRequest(BaseModel):
+    concept: str
+
+
+class SongRec(BaseModel):
+    title: str
+    artist: str
+
+
+class AnimeRec(BaseModel):
+    title: str
+    scene: str
+
+
+class ArticleRec(BaseModel):
+    title: str
+    keywords: str
+
+
+class MediaRecommendResponse(BaseModel):
+    songs: list[SongRec]
+    anime: list[AnimeRec]
+    articles: list[ArticleRec]
