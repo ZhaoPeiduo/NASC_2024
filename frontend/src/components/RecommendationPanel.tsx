@@ -43,11 +43,13 @@ export default function RecommendationPanel({ concepts }: { concepts: string[] }
 
   useEffect(() => {
     if (concepts.length === 0) return;
+    let cancelled = false;
     setLoading(true); setData(null);
     api.getMediaRecommendations(concepts[0])
-      .then(setData)
-      .catch(() => setData(null))
-      .finally(() => setLoading(false));
+      .then(result => { if (!cancelled) setData(result); })
+      .catch(() => { if (!cancelled) setData(null); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [concepts.join(",")]);
 
