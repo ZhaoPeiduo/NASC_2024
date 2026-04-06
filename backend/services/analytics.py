@@ -48,8 +48,30 @@ async def get_stats(db: AsyncSession, user_id: int) -> dict:
     }
 
 
+async def generate_and_cache_explanation(
+    db: AsyncSession,
+    attempt: Attempt,
+    provider,
+) -> str:
+    import json as _json
+    options_text = "\n".join(_json.loads(attempt.options or "[]"))
+    prompt = (
+        f"Japanese grammar question:\n{attempt.question_text}\n\n"
+        f"Options:\n{options_text}\n\n"
+        f"Correct answer: {attempt.correct_answer}\n"
+        # In quiz mode, llm_answer stores the user's selected option
+        f"User's answer: {attempt.llm_answer}\n\n"
+        "In 2-3 sentences, explain why the correct answer is right and why the user's answer is wrong. "
+        "Be concise and educational."
+    )
+    explanation = await provider.complete(prompt)
+    attempt.explanation = explanation
+    await db.commit()
+    return explanation
+
+
 async def get_weak_concepts(
-    db: AsyncSession, user_id: int, limit: int = 5
+    db: AsyncSession, user_id: int, limit: int = 10
 ) -> list[str]:
     result = await db.execute(
         select(Attempt).where(

@@ -52,6 +52,10 @@ class WeakConceptsResponse(BaseModel):
     concepts: list[str]
 
 
+class ExplainResponse(BaseModel):
+    explanation: str
+
+
 class StatsResponse(BaseModel):
     total_attempts: int
     correct_rate: float

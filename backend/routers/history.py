@@ -1,5 +1,5 @@
 import json
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -7,9 +7,11 @@ from backend.database import get_db
 from backend.models.tables import Attempt, User
 from backend.auth.dependencies import get_current_user
 from backend.schemas.api import (
-    AttemptResponse, AttemptRecord, StatsResponse, WeakConceptsResponse,
+    AttemptResponse, AttemptRecord, ExplainResponse, StatsResponse, WeakConceptsResponse,
 )
-from backend.services.analytics import get_stats, get_weak_concepts, record_attempt
+from backend.services.analytics import (
+    generate_and_cache_explanation, get_stats, get_weak_concepts, record_attempt,
+)
 from backend.services.llm.factory import get_llm_provider
 
 router = APIRouter(prefix="/api/v1")
@@ -66,7 +68,7 @@ async def record(
 
 @router.get("/history/weak-concepts", response_model=WeakConceptsResponse)
 async def history_weak_concepts(
-    limit: int = 10,
+    limit: int = Query(default=10, ge=1, le=50),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -74,7 +76,7 @@ async def history_weak_concepts(
     return WeakConceptsResponse(concepts=concepts)
 
 
-@router.post("/history/{attempt_id}/explain")
+@router.post("/history/{attempt_id}/explain", response_model=ExplainResponse)
 async def explain_attempt(
     attempt_id: int,
     current_user: User = Depends(get_current_user),
@@ -91,23 +93,11 @@ async def explain_attempt(
         raise HTTPException(status_code=404, detail="Attempt not found")
 
     if attempt.explanation:
-        return {"explanation": attempt.explanation}
+        return ExplainResponse(explanation=attempt.explanation)
 
     provider = get_llm_provider()
-    options_text = "\n".join(json.loads(attempt.options or "[]"))
-    prompt = (
-        f"Japanese grammar question:\n{attempt.question_text}\n\n"
-        f"Options:\n{options_text}\n\n"
-        f"Correct answer: {attempt.correct_answer}\n"
-        f"User's answer: {attempt.llm_answer}\n\n"
-        "In 2-3 sentences, explain why the correct answer is right and why the user's answer is wrong. "
-        "Be concise and educational."
-    )
-    explanation = await provider.complete(prompt)
-
-    attempt.explanation = explanation
-    await db.commit()
-    return {"explanation": explanation}
+    explanation = await generate_and_cache_explanation(db, attempt, provider)
+    return ExplainResponse(explanation=explanation)
 
 
 @router.get("/stats", response_model=StatsResponse)

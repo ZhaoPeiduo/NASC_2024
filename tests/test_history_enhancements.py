@@ -1,4 +1,3 @@
-import json
 import pytest
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -113,3 +112,29 @@ async def test_record_batch_returns_ids(auth_client):
     assert "ids" in body
     assert len(body["ids"]) == 1
     assert isinstance(body["ids"][0], int)
+
+
+@pytest.mark.asyncio
+async def test_explain_attempt_cache_hit(auth_client, db_session, test_user):
+    """When an attempt already has an explanation, it is returned without calling the LLM."""
+    attempt = await record_attempt(
+        db=db_session,
+        user_id=test_user.id,
+        question_text="Which particle is correct?",
+        options=["A: は", "B: が"],
+        correct_answer="A",
+        llm_answer="B",
+        explanation="は is the topic marker and is correct here.",
+        concepts=["particles"],
+        user_marked_correct=False,
+    )
+    resp = await auth_client.post(f"/api/v1/history/{attempt.id}/explain")
+    assert resp.status_code == 200
+    assert resp.json()["explanation"] == "は is the topic marker and is correct here."
+
+
+@pytest.mark.asyncio
+async def test_explain_attempt_not_found(auth_client):
+    """Requesting an explanation for a non-existent attempt returns 404."""
+    resp = await auth_client.post("/api/v1/history/9999/explain")
+    assert resp.status_code == 404
