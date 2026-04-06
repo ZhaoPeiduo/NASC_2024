@@ -53,8 +53,7 @@ async def generate_and_cache_explanation(
     attempt: Attempt,
     provider,
 ) -> str:
-    import json as _json
-    options_text = "\n".join(_json.loads(attempt.options or "[]"))
+    options_text = "\n".join(json.loads(attempt.options or "[]"))
     prompt = (
         f"Japanese grammar question:\n{attempt.question_text}\n\n"
         f"Options:\n{options_text}\n\n"
