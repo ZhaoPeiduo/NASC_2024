@@ -64,16 +64,18 @@ async def record_batch(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    ids = []
     for item in body.attempts:
-        await record_attempt(
+        attempt = await record_attempt(
             db=db,
             user_id=current_user.id,
             question_text=item.question_text,
             options=item.options,
             correct_answer=item.correct_answer,
-            llm_answer=item.user_answer,  # quiz mode: user's choice stored here (no LLM answer)
+            llm_answer=item.user_answer,
             explanation="",
             concepts=[],
             user_marked_correct=item.user_marked_correct,
         )
-    return {"recorded": len(body.attempts)}
+        ids.append(attempt.id)
+    return {"recorded": len(ids), "ids": ids}

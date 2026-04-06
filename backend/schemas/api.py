@@ -33,6 +33,7 @@ class AttemptRecord(BaseModel):
     llm_answer: str
     user_marked_correct: bool
     concepts: list[str]
+    explanation: str = ""
 
 
 class AttemptResponse(BaseModel):
@@ -43,6 +44,12 @@ class AttemptResponse(BaseModel):
     user_marked_correct: bool
     concepts: list[str]
     created_at: str
+    options: list[str] = []
+    explanation: str = ""
+
+
+class WeakConceptsResponse(BaseModel):
+    concepts: list[str]
 
 
 class StatsResponse(BaseModel):
