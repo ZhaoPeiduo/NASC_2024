@@ -74,12 +74,19 @@ export const api = {
     llm_answer: string;
     user_marked_correct: boolean;
     concepts: string[];
+    explanation?: string;
   }) => post("/api/v1/history/record", body, true),
 
   getHistory: () =>
     get<import("../types").AttemptResponse[]>("/api/v1/history"),
 
   getStats: () => get<import("../types").StatsResponse>("/api/v1/stats"),
+
+  getWeakConcepts: (limit = 10) =>
+    get<{ concepts: string[] }>(`/api/v1/history/weak-concepts?limit=${limit}`),
+
+  explainAttempt: (attemptId: number) =>
+    post<{ explanation: string }>(`/api/v1/history/${attemptId}/explain`, {}, true),
 
   getRecommendations: (concepts: string[]) =>
     get<import("../types").VideoRecommendation[]>(
@@ -125,7 +132,7 @@ export const api = {
     question_text: string; options: string[]; correct_answer: string;
     user_answer: string; user_marked_correct: boolean;
   }[]) =>
-    post("/api/v1/practice/record-batch", { attempts }, true),
+    post<{ recorded: number; ids: number[] }>("/api/v1/practice/record-batch", { attempts }, true),
 
   getMediaRecommendations: (concept: string) =>
     post<import("../types").MediaRecommendResponse>(

@@ -15,6 +15,8 @@ export interface AttemptResponse {
   user_marked_correct: boolean;
   concepts: string[];
   created_at: string;
+  options: string[];
+  explanation: string;
 }
 
 export interface StatsResponse {
