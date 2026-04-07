@@ -5,7 +5,7 @@ import StreamingProgress from "../components/StreamingProgress";
 import ImageExtractor from "../components/ImageExtractor";
 import RecommendationPanel from "../components/RecommendationPanel";
 
-export default function PracticePage() {
+export default function AskPage() {
   const {
     fields, setFields, setOption,
     phase, streamText, result, error,
@@ -18,7 +18,7 @@ export default function PracticePage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-slate-800 mb-6">Practice</h1>
+      <h1 className="text-xl font-bold text-slate-800 mb-6">Ask</h1>
       <QuizForm
         question={fields.question}
         options={fields.options}
