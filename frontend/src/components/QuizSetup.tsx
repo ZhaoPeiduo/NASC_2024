@@ -13,6 +13,7 @@ export default function QuizSetup({ onStart }: Props) {
   const [minutes, setMinutes] = useState(10);
   const [includeHistory, setIncludeHistory] = useState(false);
   const [historyCount, setHistoryCount] = useState(5);
+  const [maxQuestions, setMaxQuestions] = useState(0); // 0 = all
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -125,15 +126,45 @@ export default function QuizSetup({ onStart }: Props) {
             </div>
           </div>
         )}
+
+        {/* Question count */}
+        <div className="flex items-center justify-between border-t border-slate-100 pt-3">
+          <div>
+            <p className="text-sm font-medium text-slate-700">Max questions</p>
+            <p className="text-xs text-slate-400">Set 0 for all</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setMaxQuestions(n => Math.max(0, n - 5))}
+              aria-label="Decrease max questions"
+              className="w-7 h-7 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50
+                active:scale-95 transition-all text-sm flex items-center justify-center"
+            >−</button>
+            <span className="text-sm font-semibold text-slate-800 w-12 text-center">
+              {maxQuestions === 0 ? "All" : `${maxQuestions}`}
+            </span>
+            <button
+              onClick={() => setMaxQuestions(n => n + 5)}
+              aria-label="Increase max questions"
+              className="w-7 h-7 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50
+                active:scale-95 transition-all text-sm flex items-center justify-center"
+            >+</button>
+          </div>
+        </div>
       </div>
 
       <button
         disabled={questions.length === 0}
-        onClick={() => onStart(questions, minutes * 60)}
+        onClick={() => {
+          const qs = maxQuestions > 0 ? questions.slice(0, maxQuestions) : questions;
+          onStart(qs, minutes * 60);
+        }}
         className="w-full bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white py-2.5 rounded-xl
           font-semibold text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        {questions.length > 0 ? `Start Quiz — ${questions.length} questions` : "Upload CSV to start"}
+        {questions.length > 0
+          ? `Start Quiz — ${maxQuestions > 0 ? Math.min(maxQuestions, questions.length) : questions.length} questions`
+          : "Upload CSV to start"}
       </button>
     </div>
   );
