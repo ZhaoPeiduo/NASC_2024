@@ -21,19 +21,34 @@ export function useQuizSession() {
     }
     setError(""); setStreamText(""); setResult(null); setPhase("answering");
 
+    const optLabels = fields.options
+      .filter(o => o.trim())
+      .map((o, i) => `${String.fromCharCode(65 + i)}: ${o}`);
+
     try {
-      const optLabels = fields.options
-        .filter(o => o.trim())
-        .map((o, i) => `${String.fromCharCode(65 + i)}: ${o}`);
+      let finalResult: SolveResult | null = null;
 
       for await (const { event, data } of api.solveStreamFetch(fields.question, optLabels)) {
         if (event === "token") {
           setStreamText(t => t + data);
           if (data.includes("EXPLANATION")) setPhase("explaining");
         } else if (event === "result") {
-          setResult(JSON.parse(data) as SolveResult);
+          finalResult = JSON.parse(data) as SolveResult;
+          setResult(finalResult);
           setPhase("done");
         }
+      }
+
+      if (finalResult) {
+        api.recordAttempt({
+          question_text: fields.question,
+          options: optLabels,
+          correct_answer: finalResult.answer,
+          llm_answer: finalResult.answer,
+          user_marked_correct: true,
+          concepts: finalResult.concepts,
+          explanation: finalResult.explanation,
+        }).catch(() => {/* non-fatal */});
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Is the backend running?");
