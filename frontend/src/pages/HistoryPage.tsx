@@ -36,7 +36,7 @@ export default function HistoryPage() {
         <p className="text-slate-400 text-center py-12">No attempts yet. Start practicing!</p>
       ) : (
         <div className="space-y-3">
-          {shown.map(a => <HistoryItem key={a.id} attempt={a} />)}
+          {shown.map((a, i) => <HistoryItem key={a.id} attempt={a} index={i} />)}
         </div>
       )}
     </div>
