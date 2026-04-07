@@ -75,7 +75,7 @@ export const api = {
     user_marked_correct: boolean;
     concepts: string[];
     explanation?: string;
-  }) => post("/api/v1/history/record", body, true),
+  }) => post<{ status: string }>("/api/v1/history/record", body, true),
 
   getHistory: () =>
     get<import("../types").AttemptResponse[]>("/api/v1/history"),
