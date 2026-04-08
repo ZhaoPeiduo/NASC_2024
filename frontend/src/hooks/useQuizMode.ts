@@ -15,7 +15,7 @@ interface QuizAnswer {
   options: string[];
 }
 
-interface PersistedResults {
+export interface PersistedResults {
   answers: QuizAnswer[];
   analyses: AnalysisItem[];
   wrongAttemptIds: number[];
