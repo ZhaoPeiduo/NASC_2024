@@ -50,10 +50,11 @@ export default function StatsPage() {
         <div className="bg-white border border-slate-200 rounded-xl p-6">
           <p className="text-sm font-semibold text-slate-700 mb-3">Weak Concepts to Review</p>
           <div className="flex flex-wrap gap-2">
-            {stats.weak_concepts.map(c => (
+            {stats.weak_concepts.map((c, i) => (
               <button key={c}
                 onClick={() => generateForConcept(c)}
-                className="bg-red-50 text-red-700 text-sm px-3 py-1 rounded-full hover:bg-red-100 transition-colors"
+                className="bg-red-50 text-red-700 text-sm px-3 py-1 rounded-full hover:bg-red-100 transition-colors animate-pop-in"
+                style={{ animationDelay: `${i * 50}ms` }}
               >
                 {c} → Practice
               </button>
