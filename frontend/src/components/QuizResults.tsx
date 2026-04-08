@@ -21,7 +21,7 @@ export default function QuizResults({
 
   const handleGenerate = async (index: number) => {
     const attemptId = wrongAttemptIds[index];
-    if (!attemptId) return;
+    if (attemptId == null) return;
     setGenerating(g => ({ ...g, [index]: true }));
     try {
       const res = await api.explainAttempt(attemptId);
@@ -61,7 +61,27 @@ export default function QuizResults({
               ))}
             </div>
           ) : analyses.length === 0 ? (
-            <p className="text-xs text-slate-400 italic">Analysis unavailable</p>
+            wrongAttemptIds.length > 0 ? (
+              <div className="space-y-2">
+                {wrongAttemptIds.map((id, i) => (
+                  <div key={i} className="bg-white border border-red-100 rounded-xl p-3 animate-slide-in"
+                    style={{ animationDelay: `${i * 60}ms` }}>
+                    <button
+                      onClick={() => handleGenerate(i)}
+                      disabled={generating[i]}
+                      className="text-xs text-brand-500 font-semibold hover:underline disabled:opacity-50"
+                    >
+                      {generating[i] ? "Generating…" : "Generate explanation"}
+                    </button>
+                    {explanations[i] && (
+                      <p className="text-xs text-slate-600 leading-relaxed mt-2">{explanations[i]}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400 italic">Analysis unavailable</p>
+            )
           ) : (
             analyses.map((item, i) => {
               const explanation = explanations[i] || item.explanation;
