@@ -4,6 +4,8 @@ import type { QuizQuestion, AnalysisItem } from "../types";
 
 export type QuizScreen = "setup" | "active" | "results";
 
+const STORAGE_KEY = "quiz_last_results";
+
 interface QuizAnswer {
   questionIndex: number;
   userAnswer: string;
@@ -11,6 +13,23 @@ interface QuizAnswer {
   isCorrect: boolean;
   question: string;
   options: string[];
+}
+
+interface PersistedResults {
+  answers: QuizAnswer[];
+  analyses: AnalysisItem[];
+  wrongAttemptIds: number[];
+  timestamp: number;
+}
+
+export function loadPersistedResults(): PersistedResults | null {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as PersistedResults;
+  } catch {
+    return null;
+  }
 }
 
 export function useQuizMode() {
@@ -23,6 +42,7 @@ export function useQuizMode() {
   const [timeLimitSec, setTimeLimitSec] = useState(0);
   const [analyses, setAnalyses] = useState<AnalysisItem[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
+  const [wrongAttemptIds, setWrongAttemptIds] = useState<number[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const answersRef = useRef<QuizAnswer[]>([]);
 
@@ -44,25 +64,46 @@ export function useQuizMode() {
         user_answer: a.userAnswer,
       }));
 
-    // Record all attempts to history
-    await api.recordBatch(
-      finalAnswers.map(a => ({
-        question_text: a.question,
-        options: a.options,
-        correct_answer: a.correctAnswer,
-        user_answer: a.userAnswer,
-        user_marked_correct: a.isCorrect,
-      }))
-    ).catch(() => {/* non-fatal */});
+    // Record all attempts, collect IDs
+    let resolvedWrongIds: number[] = [];
+    try {
+      const batchResult = await api.recordBatch(
+        finalAnswers.map(a => ({
+          question_text: a.question,
+          options: a.options,
+          correct_answer: a.correctAnswer,
+          user_answer: a.userAnswer,
+          user_marked_correct: a.isCorrect,
+        }))
+      );
+      const allIds = batchResult.ids ?? [];
+      resolvedWrongIds = finalAnswers
+        .map((a, i) => ({ isCorrect: a.isCorrect, id: allIds[i] ?? 0 }))
+        .filter(x => !x.isCorrect)
+        .map(x => x.id);
+    } catch {/* non-fatal */}
+
+    setWrongAttemptIds(resolvedWrongIds);
 
     // Get LLM analysis for wrong answers
+    let resolvedAnalyses: AnalysisItem[] = [];
     if (wrong.length > 0) {
       try {
         const res = await api.analyzePractice(wrong);
-        setAnalyses(res.analyses);
+        resolvedAnalyses = res.analyses;
+        setAnalyses(resolvedAnalyses);
       } catch { setAnalyses([]); }
     }
     setAnalyzing(false);
+
+    // Persist results to sessionStorage
+    const toSave: PersistedResults = {
+      answers: finalAnswers,
+      analyses: resolvedAnalyses,
+      wrongAttemptIds: resolvedWrongIds,
+      timestamp: Date.now(),
+    };
+    try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); } catch {/* ignore */}
   }, []);
 
   const startQuiz = useCallback((qs: QuizQuestion[], timeSec: number) => {
@@ -71,9 +112,17 @@ export function useQuizMode() {
     setSelected(null);
     setAnswers([]);
     setAnalyses([]);
+    setWrongAttemptIds([]);
     setTimeLimitSec(timeSec);
     setTimeLeft(timeSec);
     setScreen("active");
+  }, []);
+
+  const restoreResults = useCallback((saved: PersistedResults) => {
+    setAnswers(saved.answers);
+    setAnalyses(saved.analyses);
+    setWrongAttemptIds(saved.wrongAttemptIds);
+    setScreen("results");
   }, []);
 
   const finishedRef = useRef(false);
@@ -87,7 +136,6 @@ export function useQuizMode() {
         if (t <= 1) {
           if (!finishedRef.current) {
             finishedRef.current = true;
-            // Schedule finishQuiz outside the updater to avoid side effects in setState
             setTimeout(() => finishQuiz(answersRef.current), 0);
           }
           return 0;
@@ -132,6 +180,7 @@ export function useQuizMode() {
     answersRef.current = [];
     setAnswers([]);
     setAnalyses([]);
+    setWrongAttemptIds([]);
   };
 
   const score = answers.filter(a => a.isCorrect).length;
@@ -141,7 +190,8 @@ export function useQuizMode() {
   return {
     screen, questions, current, selected, setSelected,
     answers, timeLeft, timeLimitSec, analyses, analyzing,
+    wrongAttemptIds,
     score, timerWarning, timerCritical,
-    startQuiz, confirmAnswer, reset,
+    startQuiz, confirmAnswer, reset, restoreResults,
   };
 }

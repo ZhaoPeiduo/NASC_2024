@@ -1,4 +1,4 @@
-import { useQuizMode } from "../hooks/useQuizMode";
+import { loadPersistedResults, useQuizMode } from "../hooks/useQuizMode";
 import QuizSetup from "../components/QuizSetup";
 import ActiveQuiz from "../components/ActiveQuiz";
 import QuizResults from "../components/QuizResults";
@@ -7,14 +7,28 @@ export default function QuizPage() {
   const {
     screen, questions, current, selected, setSelected,
     answers, timeLeft, timeLimitSec, analyses, analyzing,
+    wrongAttemptIds,
     score, timerWarning, timerCritical,
-    startQuiz, confirmAnswer, reset,
+    startQuiz, confirmAnswer, reset, restoreResults,
   } = useQuizMode();
+
+  const savedResults = loadPersistedResults();
 
   return (
     <div>
       {screen === "setup" && (
-        <QuizSetup onStart={startQuiz} />
+        <div className="space-y-3">
+          <QuizSetup onStart={startQuiz} />
+          {savedResults && (
+            <button
+              onClick={() => restoreResults(savedResults)}
+              className="w-full border border-slate-200 hover:bg-slate-50 active:scale-[0.98]
+                text-slate-500 py-2 rounded-xl text-xs font-medium transition-all"
+            >
+              View Last Quiz Results
+            </button>
+          )}
+        </div>
       )}
 
       {screen === "active" && questions[current] && (
@@ -38,6 +52,7 @@ export default function QuizPage() {
           total={answers.length}
           analyses={analyses}
           analyzing={analyzing}
+          wrongAttemptIds={wrongAttemptIds}
           onRetry={reset}
         />
       )}
