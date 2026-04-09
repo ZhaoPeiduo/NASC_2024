@@ -21,15 +21,15 @@ export default function HistoryPage() {
     <div className="space-y-5">
       {/* Weak concepts panel */}
       {weakConcepts.length > 0 && (
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden animate-fade-in">
+        <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden animate-fade-in">
           <button
             onClick={() => setConceptsOpen(v => !v)}
-            className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-slate-50 transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-stone-50 transition-colors"
           >
-            <span className="text-sm font-semibold text-slate-700">
+            <span className="text-sm font-semibold text-stone-700">
               Top {weakConcepts.length} Weak Points
             </span>
-            <span className="text-slate-400 text-xs">{conceptsOpen ? "▲" : "▼"}</span>
+            <span className="text-stone-400 text-xs">{conceptsOpen ? "▲" : "▼"}</span>
           </button>
           {conceptsOpen && (
             <div className="px-4 pb-3 flex flex-wrap gap-1.5 animate-fade-in">
@@ -50,12 +50,12 @@ export default function HistoryPage() {
       {/* Filter + list */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold text-slate-800">History</h1>
+          <h1 className="text-xl font-bold text-stone-800">History</h1>
           <div className="flex gap-2">
             {(["all", "wrong"] as const).map(f => (
               <button key={f} onClick={() => setFilter(f)}
                 className={`text-sm px-3 py-1.5 rounded-lg font-medium transition-colors
-                  ${filter === f ? "bg-brand-500 text-white" : "bg-white border border-slate-200 text-slate-600"}`}
+                  ${filter === f ? "bg-brand-500 text-white" : "bg-white border border-stone-200 text-stone-600"}`}
               >
                 {f === "all" ? "All" : "Wrong only"}
               </button>
@@ -64,9 +64,9 @@ export default function HistoryPage() {
         </div>
 
         {loading ? (
-          <p className="text-slate-400 text-center py-12">Loading…</p>
+          <p className="text-stone-400 text-center py-12">Loading…</p>
         ) : shown.length === 0 ? (
-          <p className="text-slate-400 text-center py-12">No attempts yet. Start practicing!</p>
+          <p className="text-stone-400 text-center py-12">No attempts yet. Start practicing!</p>
         ) : (
           <div className="space-y-3">
             {shown.map((a, i) => <HistoryItem key={a.id} attempt={a} index={i} />)}

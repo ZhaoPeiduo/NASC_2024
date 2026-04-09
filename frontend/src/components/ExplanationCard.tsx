@@ -11,18 +11,18 @@ export default function ExplanationCard({
     <div className="mt-4 space-y-3 animate-fade-in">
       {result ? (
         <>
-          <div className="flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-xl animate-pop-in">
+          <div className="flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-2xl animate-pop-in">
             <span className="text-xl font-black text-green-700 shrink-0">{result.answer}</span>
-            <p className="text-sm text-slate-700 leading-relaxed">{result.explanation}</p>
+            <p className="text-sm text-stone-700 leading-relaxed">{result.explanation}</p>
           </div>
 
           {Object.entries(result.wrong_options).length > 0 && (
-            <div className="p-3 bg-slate-50 rounded-xl space-y-1.5">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Why others are wrong</p>
+            <div className="p-3 bg-stone-50 rounded-2xl space-y-1.5">
+              <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide">Why others are wrong</p>
               {Object.entries(result.wrong_options).map(([opt, reason]) => (
                 <div key={opt} className="flex gap-2 text-sm animate-slide-in">
                   <span className="font-bold text-red-400 w-4 shrink-0">{opt}</span>
-                  <span className="text-slate-600 text-xs leading-relaxed">{reason}</span>
+                  <span className="text-stone-600 text-xs leading-relaxed">{reason}</span>
                 </div>
               ))}
             </div>
@@ -39,8 +39,8 @@ export default function ExplanationCard({
           )}
         </>
       ) : (
-        <div className="p-3 bg-white border border-slate-200 rounded-xl min-h-16">
-          <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">
+        <div className="p-3 bg-white border border-stone-200 rounded-2xl min-h-16">
+          <p className="text-sm text-stone-600 whitespace-pre-wrap leading-relaxed">
             {streamText}<span className="animate-pulse">▌</span>
           </p>
         </div>

@@ -29,21 +29,21 @@ export default function ActiveQuiz({
     <div className="space-y-4 animate-fade-in">
       {/* Header row */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-400">
+        <span className="text-xs font-semibold text-stone-400">
           {questionNumber} / {totalQuestions}
         </span>
         {timeLimitSec > 0 && (
           <span className={`text-sm font-bold tabular-nums transition-colors
             ${timerCritical ? "text-red-500 animate-timer-pulse"
             : timerWarning  ? "text-amber-500"
-            : "text-slate-500"}`}>
+            : "text-stone-500"}`}>
             ⏱ {formatTime(timeLeft)}
           </span>
         )}
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
+      <div className="h-1 bg-stone-100 rounded-full overflow-hidden">
         <div
           className="h-full bg-brand-500 rounded-full transition-all duration-500"
           style={{ width: `${progress}%` }}
@@ -51,8 +51,8 @@ export default function ActiveQuiz({
       </div>
 
       {/* Question */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4">
-        <p className="text-base text-slate-800 leading-relaxed font-medium">
+      <div className="bg-white border border-stone-200 rounded-2xl p-4">
+        <p className="text-base text-stone-800 leading-relaxed font-medium">
           {question.question}
         </p>
         {question.from_history && (
@@ -71,11 +71,11 @@ export default function ActiveQuiz({
             <button
               key={letter}
               onClick={() => onSelect(letter)}
-              className={`w-full text-left p-3 rounded-xl border text-sm transition-all
+              className={`w-full text-left p-3 rounded-2xl border text-sm transition-all
                 active:scale-[0.99] font-medium
                 ${isSelected
                   ? "border-brand-500 bg-brand-50 text-brand-700 shadow-sm"
-                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                  : "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50"
                 }`}
             >
               {opt}
@@ -88,7 +88,7 @@ export default function ActiveQuiz({
         onClick={onConfirm}
         disabled={!selected}
         className="w-full bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white py-2.5
-          rounded-xl font-semibold text-sm transition-all disabled:opacity-40"
+          rounded-2xl font-semibold text-sm transition-all disabled:opacity-40"
       >
         {questionNumber === totalQuestions ? "Finish Quiz" : "Next →"}
       </button>

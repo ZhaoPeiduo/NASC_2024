@@ -30,26 +30,26 @@ export default function HistoryItem({ attempt, index = 0 }: Props) {
 
   return (
     <div
-      className="bg-white border border-slate-200 rounded-xl p-3 space-y-1.5 animate-fade-in
+      className="bg-white border border-stone-200 rounded-2xl p-3 space-y-1.5 animate-fade-in
         hover:shadow-sm transition-shadow cursor-pointer"
       style={{ animationDelay: `${index * 80}ms` }}
       onClick={() => setExpanded(v => !v)}
     >
       {/* Header row */}
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm text-slate-800 flex-1 leading-snug">{attempt.question_text}</p>
+        <p className="text-sm text-stone-800 flex-1 leading-snug">{attempt.question_text}</p>
         <div className="flex items-center gap-1.5 shrink-0">
           <span className={`text-xs font-bold px-2 py-0.5 rounded-full
             ${attempt.user_marked_correct ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
             {attempt.user_marked_correct ? "✓" : "✗"}
           </span>
-          <span className="text-slate-300 text-xs">{expanded ? "▲" : "▼"}</span>
+          <span className="text-stone-300 text-xs">{expanded ? "▲" : "▼"}</span>
         </div>
       </div>
 
       {/* Summary row */}
-      <div className="flex items-center gap-3 text-xs text-slate-400">
-        <span>Answer: <span className="font-semibold text-slate-600">{attempt.correct_answer}</span></span>
+      <div className="flex items-center gap-3 text-xs text-stone-400">
+        <span>Answer: <span className="font-semibold text-stone-600">{attempt.correct_answer}</span></span>
         <span>{date}</span>
       </div>
 
@@ -57,14 +57,14 @@ export default function HistoryItem({ attempt, index = 0 }: Props) {
       {attempt.concepts.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {attempt.concepts.map(c => (
-            <span key={c} className="bg-slate-100 text-slate-500 text-xs px-1.5 py-0.5 rounded-full">{c}</span>
+            <span key={c} className="bg-stone-100 text-stone-500 text-xs px-1.5 py-0.5 rounded-full">{c}</span>
           ))}
         </div>
       )}
 
       {/* Expanded section */}
       {expanded && (
-        <div className="border-t border-slate-100 pt-2 space-y-2 animate-fade-in">
+        <div className="border-t border-stone-100 pt-2 space-y-2 animate-fade-in">
           {/* Options grid */}
           {attempt.options.length > 0 && (
             <div className="space-y-1">
@@ -80,7 +80,7 @@ export default function HistoryItem({ attempt, index = 0 }: Props) {
                         ? "bg-green-50 text-green-700 font-medium border border-green-200"
                         : isUserAnswer && !attempt.user_marked_correct
                           ? "bg-red-50 text-red-600 border border-red-200"
-                          : "bg-slate-50 text-slate-600"
+                          : "bg-stone-50 text-stone-600"
                       }`}
                   >
                     {opt}
@@ -92,7 +92,7 @@ export default function HistoryItem({ attempt, index = 0 }: Props) {
 
           {/* Explanation */}
           {explanation ? (
-            <p className="text-xs text-slate-600 leading-relaxed">{explanation}</p>
+            <p className="text-xs text-stone-600 leading-relaxed">{explanation}</p>
           ) : (
             <div>
               {genError && <p className="text-xs text-red-500 mb-1">{genError}</p>}
