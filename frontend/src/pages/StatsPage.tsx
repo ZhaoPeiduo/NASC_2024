@@ -27,60 +27,82 @@ export default function StatsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-stone-800">Your Progress</h1>
-
-      <div className="grid grid-cols-3 gap-4">
-        {[
-          { label: "Total Attempts", value: stats.total_attempts },
-          { label: "Accuracy", value: `${Math.round(stats.correct_rate * 100)}%` },
-          { label: "Study Days", value: stats.study_days },
-        ].map(({ label, value }) => (
-          <div key={label} className="bg-white border border-stone-200 rounded-2xl p-4 text-center">
-            <p className="text-3xl font-bold text-stone-800">{value}</p>
-            <p className="text-xs text-stone-400 mt-1">{label}</p>
-          </div>
-        ))}
+      <div>
+        <h1 className="text-xl font-bold text-stone-800">Your Progress</h1>
+        <p className="text-sm text-stone-500 mt-0.5">
+          Track accuracy, study days, and the grammar points that need more work.
+        </p>
       </div>
 
-      <div className="bg-white border border-stone-200 rounded-2xl p-6">
-        <BarStat label="Accuracy" value={stats.correct_rate} color="bg-brand-500" />
-      </div>
-
-      {stats.weak_concepts.length > 0 && (
-        <div className="bg-white border border-stone-200 rounded-2xl p-6">
-          <p className="text-sm font-semibold text-stone-700 mb-3">Weak Concepts to Review</p>
-          <div className="flex flex-wrap gap-2">
-            {stats.weak_concepts.map((c, i) => (
-              <button key={c}
-                onClick={() => generateForConcept(c)}
-                className="bg-red-50 text-red-700 text-sm px-3 py-1 rounded-full hover:bg-red-100 transition-colors animate-pop-in"
-                style={{ animationDelay: `${i * 50}ms` }}
-              >
-                {c} → Practice
-              </button>
+      {stats.total_attempts === 0 ? (
+        <div className="text-center py-16 space-y-3 bg-white rounded-2xl shadow-sm border border-stone-200">
+          <p className="text-2xl">📊</p>
+          <p className="text-stone-500 font-medium">Your journey starts today</p>
+          <p className="text-stone-400 text-sm max-w-xs mx-auto">
+            Study at least once a day to build your streak and uncover your weak grammar points.
+          </p>
+          <a href="/ask"
+            className="inline-block mt-1 text-sm text-brand-600 font-semibold hover:underline"
+          >
+            Start practicing →
+          </a>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { label: "Total Attempts", value: stats.total_attempts },
+              { label: "Accuracy", value: `${Math.round(stats.correct_rate * 100)}%` },
+              { label: "Study Days", value: stats.study_days },
+            ].map(({ label, value }) => (
+              <div key={label} className="bg-white border border-stone-200 rounded-2xl p-4 text-center">
+                <p className="text-3xl font-bold text-stone-800">{value}</p>
+                <p className="text-xs text-stone-400 mt-1">{label}</p>
+              </div>
             ))}
           </div>
 
-          {generating && <p className="text-sm text-stone-400 mt-3">Generating question…</p>}
-          {genError && <p className="text-red-600 text-sm mt-3">{genError}</p>}
-          {generated && (
-            <div className="mt-4 p-4 bg-slate-50 rounded-2xl space-y-3">
-              <p className="text-sm font-semibold text-stone-700">Practice Question</p>
-              <p className="text-sm text-stone-800">{generated.question}</p>
-              <div className="grid grid-cols-2 gap-2">
-                {generated.options.map((opt, i) => (
-                  <div key={i} className={`text-xs p-2 rounded-lg border
-                    ${opt.startsWith(generated.correct_answer)
-                      ? "bg-green-50 border-green-200 text-green-800"
-                      : "bg-white border-stone-200 text-slate-600"}`}>
-                    {opt}
-                  </div>
+          <div className="bg-white border border-stone-200 rounded-2xl p-6">
+            <BarStat label="Accuracy" value={stats.correct_rate} color="bg-brand-500" />
+          </div>
+
+          {stats.weak_concepts.length > 0 && (
+            <div className="bg-white border border-stone-200 rounded-2xl p-6">
+              <p className="text-sm font-semibold text-stone-700 mb-3">Weak Concepts to Review</p>
+              <div className="flex flex-wrap gap-2">
+                {stats.weak_concepts.map((c, i) => (
+                  <button key={c}
+                    onClick={() => generateForConcept(c)}
+                    className="bg-red-50 text-red-700 text-sm px-3 py-1 rounded-full hover:bg-red-100 transition-colors animate-pop-in"
+                    style={{ animationDelay: `${i * 50}ms` }}
+                  >
+                    {c} → Practice
+                  </button>
                 ))}
               </div>
-              <p className="text-xs text-stone-500">{generated.explanation}</p>
+
+              {generating && <p className="text-sm text-stone-400 mt-3">Generating question…</p>}
+              {genError && <p className="text-red-600 text-sm mt-3">{genError}</p>}
+              {generated && (
+                <div className="mt-4 p-4 bg-stone-50 rounded-2xl space-y-3">
+                  <p className="text-sm font-semibold text-stone-700">Practice Question</p>
+                  <p className="text-sm text-stone-800">{generated.question}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {generated.options.map((opt, i) => (
+                      <div key={i} className={`text-xs p-2 rounded-lg border
+                        ${opt.startsWith(generated.correct_answer)
+                          ? "bg-green-50 border-green-200 text-green-800"
+                          : "bg-white border-stone-200 text-stone-600"}`}>
+                        {opt}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-stone-500">{generated.explanation}</p>
+                </div>
+              )}
             </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );

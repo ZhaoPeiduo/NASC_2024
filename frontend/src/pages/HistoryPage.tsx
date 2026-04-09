@@ -50,7 +50,12 @@ export default function HistoryPage() {
       {/* Filter + list */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold text-stone-800">History</h1>
+          <div>
+            <h1 className="text-xl font-bold text-stone-800">History</h1>
+            <p className="text-sm text-stone-500 mt-0.5">
+              Every question you've answered — expand any item to review options and explanations.
+            </p>
+          </div>
           <div className="flex gap-2">
             {(["all", "wrong"] as const).map(f => (
               <button key={f} onClick={() => setFilter(f)}
@@ -66,7 +71,18 @@ export default function HistoryPage() {
         {loading ? (
           <p className="text-stone-400 text-center py-12">Loading…</p>
         ) : shown.length === 0 ? (
-          <p className="text-stone-400 text-center py-12">No attempts yet. Start practicing!</p>
+          <div className="text-center py-16 space-y-3">
+            <p className="text-2xl">📖</p>
+            <p className="text-stone-500 font-medium">No attempts yet</p>
+            <p className="text-stone-400 text-sm">
+              Answer your first question to start building your review log.
+            </p>
+            <a href="/ask"
+              className="inline-block mt-1 text-sm text-brand-600 font-semibold hover:underline"
+            >
+              Try your first question →
+            </a>
+          </div>
         ) : (
           <div className="space-y-3">
             {shown.map((a, i) => <HistoryItem key={a.id} attempt={a} index={i} />)}

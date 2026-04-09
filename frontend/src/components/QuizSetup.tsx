@@ -40,7 +40,9 @@ export default function QuizSetup({ onStart }: Props) {
     <div className="space-y-4 animate-fade-in">
       <div>
         <h1 className="text-lg font-bold text-stone-800">Timed Quiz</h1>
-        <p className="text-xs text-stone-500 mt-0.5">Upload a grammar CSV to start a timed practice session</p>
+        <p className="text-xs text-stone-500 mt-0.5">
+          Upload a question set and test yourself under timed conditions. AI reviews every mistake after.
+        </p>
       </div>
 
       {/* CSV Upload */}

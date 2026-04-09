@@ -18,7 +18,12 @@ export default function AskPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-slate-800 mb-6">Ask</h1>
+      <div className="mb-6">
+        <h1 className="text-xl font-bold text-stone-800">Ask</h1>
+        <p className="text-sm text-stone-500 mt-0.5">
+          Enter any grammar question — get an instant AI explanation of every option.
+        </p>
+      </div>
       <QuizForm
         question={fields.question}
         options={fields.options}
