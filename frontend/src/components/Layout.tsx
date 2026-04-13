@@ -13,30 +13,29 @@ export default function Layout({ children }: { children: ReactNode }) {
   const { user, loading, logout } = useAuthContext();
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center text-stone-400 text-sm">
+    <div className="min-h-screen flex items-center justify-center text-ash text-sm">
       Loading…
     </div>
   );
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="min-h-screen bg-[#f8f7f4]">
-      <nav className="bg-white shadow-sm sticky top-0 z-40 px-4 flex items-center justify-between h-14">
+    <div className="min-h-screen bg-parchment">
+      <nav className="bg-ivory border-b border-cream sticky top-0 z-40 px-6 flex items-center justify-between h-14">
         {/* Logo */}
-        <span className="text-base font-bold tracking-tight select-none">
-          <span className="text-brand-600">JLPT</span>
-          <span className="text-stone-800"> Sensei</span>
+        <span className="text-base font-semibold tracking-tight select-none text-ink">
+          JLPT <span className="text-brand-500">Sensei</span>
         </span>
 
         {/* Nav links */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-7">
           {NAV_ITEMS.map(({ to, label }) => (
             <NavLink key={to} to={to}
               className={({ isActive }) =>
-                `text-xs font-semibold transition-colors pb-0.5 border-b-2 ${
+                `text-sm transition-colors pb-0.5 border-b-2 ${
                   isActive
-                    ? "text-brand-600 border-brand-500"
-                    : "text-stone-400 border-transparent hover:text-stone-700"
+                    ? "text-ink border-brand-500 font-medium"
+                    : "text-bark border-transparent hover:text-ink"
                 }`
               }
             >
@@ -45,13 +44,13 @@ export default function Layout({ children }: { children: ReactNode }) {
           ))}
           <button
             onClick={logout}
-            className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
+            className="text-xs text-ash hover:text-bark transition-colors"
           >
             Sign out
           </button>
         </div>
       </nav>
-      <main className="max-w-3xl mx-auto px-4 py-6">{children}</main>
+      <main className="max-w-3xl mx-auto px-4 py-8">{children}</main>
     </div>
   );
 }

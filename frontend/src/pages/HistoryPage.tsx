@@ -18,25 +18,25 @@ export default function HistoryPage() {
   const shown = filter === "wrong" ? attempts.filter(a => !a.user_marked_correct) : attempts;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Weak concepts panel */}
       {weakConcepts.length > 0 && (
-        <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden animate-fade-in">
+        <div className="bg-ivory border border-cream rounded-2xl overflow-hidden animate-fade-in shadow-[rgba(0,0,0,0.05)_0px_4px_24px]">
           <button
             onClick={() => setConceptsOpen(v => !v)}
-            className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-stone-50 transition-colors"
+            className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-parchment transition-colors"
           >
-            <span className="text-sm font-semibold text-stone-700">
+            <span className="text-sm font-medium text-ink">
               Top {weakConcepts.length} Weak Points
             </span>
-            <span className="text-stone-400 text-xs">{conceptsOpen ? "▲" : "▼"}</span>
+            <span className="text-ash text-xs">{conceptsOpen ? "▲" : "▼"}</span>
           </button>
           {conceptsOpen && (
-            <div className="px-4 pb-3 flex flex-wrap gap-1.5 animate-fade-in">
+            <div className="px-5 pb-4 flex flex-wrap gap-1.5 animate-fade-in border-t border-cream">
               {weakConcepts.map((c, i) => (
                 <span
                   key={c}
-                  className="bg-red-50 text-red-600 text-xs px-2 py-1 rounded-full border border-red-100 animate-pop-in"
+                  className="bg-brand-50 text-brand-600 text-xs px-2.5 py-1 rounded-full border border-brand-100 animate-pop-in"
                   style={{ animationDelay: `${i * 40}ms` }}
                 >
                   {i + 1}. {c}
@@ -49,10 +49,10 @@ export default function HistoryPage() {
 
       {/* Filter + list */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-5">
           <div>
-            <h1 className="text-xl font-bold text-stone-800">History</h1>
-            <p className="text-sm text-stone-500 mt-0.5">
+            <h1 className="font-serif text-2xl font-medium text-ink">History</h1>
+            <p className="text-sm text-bark mt-0.5">
               Every question you've answered — expand any item to review options and explanations.
             </p>
           </div>
@@ -60,7 +60,7 @@ export default function HistoryPage() {
             {(["all", "wrong"] as const).map(f => (
               <button key={f} onClick={() => setFilter(f)}
                 className={`text-sm px-3 py-1.5 rounded-lg font-medium transition-colors
-                  ${filter === f ? "bg-brand-500 text-white" : "bg-white border border-stone-200 text-stone-600"}`}
+                  ${filter === f ? "bg-brand-500 text-ivory" : "bg-sand border border-cream text-charcoal hover:bg-sand/80"}`}
               >
                 {f === "all" ? "All" : "Wrong only"}
               </button>
@@ -69,16 +69,16 @@ export default function HistoryPage() {
         </div>
 
         {loading ? (
-          <p className="text-stone-400 text-center py-12">Loading…</p>
+          <p className="text-ash text-center py-12">Loading…</p>
         ) : shown.length === 0 ? (
-          <div className="text-center py-16 space-y-3">
+          <div className="text-center py-16 space-y-3 bg-ivory rounded-2xl border border-cream">
             <p className="text-2xl">📖</p>
-            <p className="text-stone-500 font-medium">No attempts yet</p>
-            <p className="text-stone-400 text-sm">
+            <p className="text-bark font-medium">No attempts yet</p>
+            <p className="text-ash text-sm">
               Answer your first question to start building your review log.
             </p>
             <a href="/ask"
-              className="inline-block mt-1 text-sm text-brand-600 font-semibold hover:underline"
+              className="inline-block mt-1 text-sm text-brand-500 font-semibold hover:underline"
             >
               Try your first question →
             </a>

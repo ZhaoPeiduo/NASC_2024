@@ -37,22 +37,24 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* ── Left hero panel (desktop only) ── */}
-      <div className="hidden lg:flex lg:w-[45%] bg-gradient-to-br from-brand-700 via-brand-600 to-brand-500 flex-col items-center justify-center px-12">
-        <div className="max-w-sm w-full space-y-7">
+      {/* ── Left hero panel — Near Black dark section (desktop only) ── */}
+      <div className="hidden lg:flex lg:w-[45%] bg-ink flex-col items-center justify-center px-12">
+        <div className="max-w-sm w-full space-y-8">
           {/* Brand */}
           <div>
-            <h1 className="text-4xl font-bold text-white tracking-tight">JLPT Sensei</h1>
-            <p className="text-brand-100 mt-2 text-lg font-medium">
+            <h1 className="font-serif text-4xl font-medium text-ivory tracking-tight leading-tight">
+              JLPT Sensei
+            </h1>
+            <p className="text-silver mt-3 text-base leading-relaxed">
               Master the grammar. Pass the exam.
             </p>
           </div>
 
           {/* Value props */}
-          <ul className="space-y-3">
+          <ul className="space-y-4">
             {VALUE_PROPS.map(item => (
-              <li key={item} className="flex items-start gap-3 text-brand-100 text-sm leading-relaxed">
-                <span className="mt-0.5 font-bold text-brand-200 shrink-0">✓</span>
+              <li key={item} className="flex items-start gap-3 text-silver text-sm leading-relaxed">
+                <span className="mt-0.5 text-brand-500 shrink-0 font-medium">✓</span>
                 {item}
               </li>
             ))}
@@ -61,7 +63,9 @@ export default function LoginPage() {
           {/* Tags */}
           <div className="flex gap-2 flex-wrap">
             {["N5 → N1", "AI Tutor", "Free"].map(tag => (
-              <span key={tag} className="bg-white/10 text-white/90 text-xs px-3 py-1 rounded-full">
+              <span key={tag}
+                className="bg-coal text-silver text-xs px-3 py-1 rounded-full border border-coal"
+              >
                 {tag}
               </span>
             ))}
@@ -69,22 +73,22 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ── Right form panel ── */}
-      <div className="flex-1 flex items-center justify-center bg-[#f8f7f4] p-6">
+      {/* ── Right form panel — Parchment ── */}
+      <div className="flex-1 flex items-center justify-center bg-parchment p-6">
         <div className="w-full max-w-sm">
-          {/* Mobile brand header (hidden on desktop where left panel shows) */}
+          {/* Mobile brand header */}
           <div className="lg:hidden text-center mb-8">
-            <h1 className="text-2xl font-bold text-brand-600">JLPT Sensei</h1>
-            <p className="text-stone-500 text-sm mt-1">Master the grammar. Pass the exam.</p>
+            <h1 className="font-serif text-2xl font-medium text-ink">JLPT Sensei</h1>
+            <p className="text-bark text-sm mt-1">Master the grammar. Pass the exam.</p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-md p-8">
+          <div className="bg-ivory rounded-2xl border border-cream shadow-[rgba(0,0,0,0.05)_0px_4px_24px] p-8">
             {/* Mode toggle */}
             <div className="flex gap-2 mb-6">
               {(["login", "register"] as const).map(m => (
                 <button key={m} onClick={() => switchMode(m)}
                   className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors
-                    ${mode === m ? "bg-brand-500 text-white" : "bg-stone-100 text-stone-600"}`}
+                    ${mode === m ? "bg-brand-500 text-ivory" : "bg-sand text-charcoal"}`}
                 >
                   {m === "login" ? "Sign In" : "Sign Up"}
                 </button>
@@ -93,22 +97,22 @@ export default function LoginPage() {
 
             <form onSubmit={submit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-bark mb-1">Email</label>
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-                  className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm
-                    focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
+                  className="w-full border border-cream bg-white rounded-xl px-3 py-2.5 text-sm text-ink
+                    focus:outline-none focus:ring-2 focus:ring-[#3898ec] focus:border-[#3898ec] transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">Password</label>
+                <label className="block text-sm font-medium text-bark mb-1">Password</label>
                 <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
-                  className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm
-                    focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
+                  className="w-full border border-cream bg-white rounded-xl px-3 py-2.5 text-sm text-ink
+                    focus:outline-none focus:ring-2 focus:ring-[#3898ec] focus:border-[#3898ec] transition-colors"
                 />
               </div>
-              {error && <p className="text-red-600 text-sm">{error}</p>}
+              {error && <p className="text-red-700 text-sm">{error}</p>}
               <button type="submit" disabled={submitting}
-                className="w-full bg-brand-500 hover:bg-brand-600 text-white py-2.5 rounded-xl
+                className="w-full bg-brand-500 hover:bg-brand-600 text-ivory py-2.5 rounded-xl
                   font-medium transition-colors disabled:opacity-50"
               >
                 {submitting ? "Please wait…" : mode === "login" ? "Sign In" : "Create Account"}

@@ -1,13 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  /* Primary: deep indigo — replaces sky blue across all brand-* classes */
-  --color-brand-50:  #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-200: #c7d2fe;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
+  /* ── Brand: Terracotta (earthy, warm — deliberately un-tech) ── */
+  --color-brand-50:  #fdf4f0;
+  --color-brand-100: #fae5da;
+  --color-brand-200: #f4c5ad;
+  --color-brand-500: #c96442;
+  --color-brand-600: #b55a3a;
+  --color-brand-700: #9e4f33;
+
+  /* ── Surfaces ── */
+  --color-parchment: #f5f4ed;   /* page background — aged paper warmth */
+  --color-ivory:     #faf9f5;   /* card surface — lightest warm layer */
+  --color-sand:      #e8e6dc;   /* warm sand — secondary buttons, borders */
+  --color-cream:     #f0eee6;   /* border cream — lightest border */
+  --color-coal:      #30302e;   /* dark surface — elevated dark elements */
+  --color-ink:       #141413;   /* near black — primary text & dark bg */
+
+  /* ── Warm Text Scale ── */
+  --color-charcoal:  #4d4c48;   /* charcoal warm — button text on light */
+  --color-bark:      #5e5d59;   /* olive gray — secondary text */
+  --color-ash:       #87867f;   /* stone gray — tertiary / metadata */
+  --color-silver:    #b0aea5;   /* warm silver — text on dark surfaces */
+
+  /* ── Typography ── */
+  --font-serif: Georgia, 'Times New Roman', serif;
 }
 
 @keyframes fade-in {

@@ -29,21 +29,21 @@ export default function ActiveQuiz({
     <div className="space-y-4 animate-fade-in">
       {/* Header row */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-stone-400">
+        <span className="text-xs font-medium text-ash">
           {questionNumber} / {totalQuestions}
         </span>
         {timeLimitSec > 0 && (
           <span className={`text-sm font-bold tabular-nums transition-colors
-            ${timerCritical ? "text-red-500 animate-timer-pulse"
-            : timerWarning  ? "text-amber-500"
-            : "text-stone-500"}`}>
+            ${timerCritical ? "text-red-600 animate-timer-pulse"
+            : timerWarning  ? "text-amber-600"
+            : "text-bark"}`}>
             ⏱ {formatTime(timeLeft)}
           </span>
         )}
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 bg-stone-100 rounded-full overflow-hidden">
+      <div className="h-1 bg-sand rounded-full overflow-hidden">
         <div
           className="h-full bg-brand-500 rounded-full transition-all duration-500"
           style={{ width: `${progress}%` }}
@@ -51,12 +51,12 @@ export default function ActiveQuiz({
       </div>
 
       {/* Question */}
-      <div className="bg-white border border-stone-200 rounded-2xl p-4">
-        <p className="text-base text-stone-800 leading-relaxed font-medium">
+      <div className="bg-ivory border border-cream rounded-2xl p-5 shadow-[rgba(0,0,0,0.05)_0px_4px_24px]">
+        <p className="text-base text-ink leading-relaxed font-medium">
           {question.question}
         </p>
         {question.from_history && (
-          <span className="inline-block mt-2 text-xs bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full">
+          <span className="inline-block mt-2 text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">
             from history
           </span>
         )}
@@ -71,11 +71,11 @@ export default function ActiveQuiz({
             <button
               key={letter}
               onClick={() => onSelect(letter)}
-              className={`w-full text-left p-3 rounded-2xl border text-sm transition-all
+              className={`w-full text-left p-3.5 rounded-xl border text-sm transition-all
                 active:scale-[0.99] font-medium
                 ${isSelected
-                  ? "border-brand-500 bg-brand-50 text-brand-700 shadow-sm"
-                  : "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50"
+                  ? "border-brand-500 bg-brand-50 text-brand-700 shadow-[0px_0px_0px_1px_#c96442]"
+                  : "border-cream bg-ivory text-bark hover:border-sand hover:text-ink"
                 }`}
             >
               {opt}
@@ -87,8 +87,8 @@ export default function ActiveQuiz({
       <button
         onClick={onConfirm}
         disabled={!selected}
-        className="w-full bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white py-2.5
-          rounded-2xl font-semibold text-sm transition-all disabled:opacity-40"
+        className="w-full bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-ivory py-2.5
+          rounded-xl font-semibold text-sm transition-all disabled:opacity-40"
       >
         {questionNumber === totalQuestions ? "Finish Quiz" : "Next →"}
       </button>

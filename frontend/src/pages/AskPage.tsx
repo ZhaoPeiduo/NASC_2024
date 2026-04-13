@@ -19,8 +19,8 @@ export default function AskPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-stone-800">Ask</h1>
-        <p className="text-sm text-stone-500 mt-0.5">
+        <h1 className="font-serif text-2xl font-medium text-ink">Ask</h1>
+        <p className="text-sm text-bark mt-1 leading-relaxed">
           Enter any grammar question — get an instant AI explanation of every option.
         </p>
       </div>

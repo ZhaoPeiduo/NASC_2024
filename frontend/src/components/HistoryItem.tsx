@@ -30,26 +30,26 @@ export default function HistoryItem({ attempt, index = 0 }: Props) {
 
   return (
     <div
-      className="bg-white border border-stone-200 rounded-2xl p-3 space-y-1.5 animate-fade-in
-        hover:shadow-sm transition-shadow cursor-pointer"
+      className="bg-ivory border border-cream rounded-2xl p-4 space-y-1.5 animate-fade-in
+        hover:shadow-[rgba(0,0,0,0.05)_0px_4px_24px] transition-shadow cursor-pointer"
       style={{ animationDelay: `${index * 80}ms` }}
       onClick={() => setExpanded(v => !v)}
     >
       {/* Header row */}
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm text-stone-800 flex-1 leading-snug">{attempt.question_text}</p>
+        <p className="text-sm text-ink flex-1 leading-snug">{attempt.question_text}</p>
         <div className="flex items-center gap-1.5 shrink-0">
           <span className={`text-xs font-bold px-2 py-0.5 rounded-full
-            ${attempt.user_marked_correct ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+            ${attempt.user_marked_correct ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
             {attempt.user_marked_correct ? "✓" : "✗"}
           </span>
-          <span className="text-stone-300 text-xs">{expanded ? "▲" : "▼"}</span>
+          <span className="text-ash text-xs">{expanded ? "▲" : "▼"}</span>
         </div>
       </div>
 
       {/* Summary row */}
-      <div className="flex items-center gap-3 text-xs text-stone-400">
-        <span>Answer: <span className="font-semibold text-stone-600">{attempt.correct_answer}</span></span>
+      <div className="flex items-center gap-3 text-xs text-ash">
+        <span>Answer: <span className="font-medium text-bark">{attempt.correct_answer}</span></span>
         <span>{date}</span>
       </div>
 
@@ -57,14 +57,14 @@ export default function HistoryItem({ attempt, index = 0 }: Props) {
       {attempt.concepts.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {attempt.concepts.map(c => (
-            <span key={c} className="bg-stone-100 text-stone-500 text-xs px-1.5 py-0.5 rounded-full">{c}</span>
+            <span key={c} className="bg-sand text-bark text-xs px-2 py-0.5 rounded-full border border-cream">{c}</span>
           ))}
         </div>
       )}
 
       {/* Expanded section */}
       {expanded && (
-        <div className="border-t border-stone-100 pt-2 space-y-2 animate-fade-in">
+        <div className="border-t border-cream pt-3 space-y-2 animate-fade-in">
           {/* Options grid */}
           {attempt.options.length > 0 && (
             <div className="space-y-1">
@@ -75,12 +75,12 @@ export default function HistoryItem({ attempt, index = 0 }: Props) {
                 return (
                   <div
                     key={i}
-                    className={`text-xs px-2 py-1 rounded-lg
+                    className={`text-xs px-2.5 py-1.5 rounded-lg
                       ${isCorrect
                         ? "bg-green-50 text-green-700 font-medium border border-green-200"
                         : isUserAnswer && !attempt.user_marked_correct
-                          ? "bg-red-50 text-red-600 border border-red-200"
-                          : "bg-stone-50 text-stone-600"
+                          ? "bg-red-50 text-red-700 border border-red-200"
+                          : "bg-parchment text-bark"
                       }`}
                   >
                     {opt}
@@ -92,10 +92,10 @@ export default function HistoryItem({ attempt, index = 0 }: Props) {
 
           {/* Explanation */}
           {explanation ? (
-            <p className="text-xs text-stone-600 leading-relaxed">{explanation}</p>
+            <p className="text-xs text-bark leading-relaxed">{explanation}</p>
           ) : (
             <div>
-              {genError && <p className="text-xs text-red-500 mb-1">{genError}</p>}
+              {genError && <p className="text-xs text-red-700 mb-1">{genError}</p>}
               <button
                 onClick={handleGenerate}
                 disabled={generating}
