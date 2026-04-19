@@ -1,11 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 
 from backend.config import settings
 from backend.schemas.api import (
     VideoRecommendation, GenerateRequest, GeneratedQuestionResponse,
     MediaRecommendRequest, MediaRecommendResponse, SongRec, AnimeRec, ArticleRec,
     WrongAnswerRecsRequest, WrongAnswerRecsResponse, VideoTutorialSet,
+    TikTokVideoMeta,
 )
+from backend.services.tiktok_service import get_random_tiktok_video, fetch_video_bytes
 from backend.services.recommendations import search_youtube
 from backend.services.media_recommendations import get_media_recommendations
 from backend.services.llm.factory import get_llm_provider
@@ -143,3 +146,55 @@ async def random_japanese_song(
         thumbnail_url=video.thumbnail_url,
         channel_title=video.channel_title,
     )
+
+
+@router.get("/tiktok/random-video", response_model=TikTokVideoMeta)
+async def tiktok_random_video(
+    topic: str = "trending",
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Return metadata for a random TikTok video matching the given topic.
+    Returns 503 when TIKTOK_MS_TOKEN is not configured.
+    Topics: trending, 日本語, anime, grammar
+    """
+    if not settings.tiktok_ms_token:
+        raise HTTPException(status_code=503, detail="TikTok not configured")
+
+    video = await get_random_tiktok_video(
+        topic=topic,
+        ms_token=settings.tiktok_ms_token,
+    )
+    if video is None:
+        raise HTTPException(status_code=404, detail="No TikTok video found")
+
+    return TikTokVideoMeta(
+        video_id=video.video_id,
+        title=video.title,
+        author=video.author,
+    )
+
+
+@router.get("/tiktok/video-stream/{video_id}")
+async def tiktok_video_stream(
+    video_id: str,
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Stream raw bytes for a TikTok video. Frontend fetches this with auth headers,
+    creates a blob URL, and assigns it to an HTML5 <video> element.
+    """
+    if not settings.tiktok_ms_token:
+        raise HTTPException(status_code=503, detail="TikTok not configured")
+
+    video_bytes = await fetch_video_bytes(
+        video_id=video_id,
+        ms_token=settings.tiktok_ms_token,
+    )
+
+    async def byte_iterator():
+        chunk_size = 1024 * 64
+        for i in range(0, len(video_bytes), chunk_size):
+            yield video_bytes[i : i + chunk_size]
+
+    return StreamingResponse(byte_iterator(), media_type="video/mp4")

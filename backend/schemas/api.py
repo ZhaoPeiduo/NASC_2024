@@ -174,3 +174,9 @@ class VideoTutorialSet(BaseModel):
 
 class WrongAnswerRecsResponse(BaseModel):
     recommendations: list[VideoTutorialSet]
+
+
+class TikTokVideoMeta(BaseModel):
+    video_id: str
+    title: str
+    author: str
