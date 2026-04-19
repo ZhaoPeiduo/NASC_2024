@@ -10,6 +10,7 @@ export default function QuizPage() {
     wrongAttemptIds,
     score, timerWarning, timerCritical,
     startQuiz, confirmAnswer, reset, restoreResults,
+    wrongAnswers,
   } = useQuizMode();
 
   const savedResults = loadPersistedResults();
@@ -22,8 +23,7 @@ export default function QuizPage() {
           {savedResults && (
             <button
               onClick={() => restoreResults(savedResults)}
-              className="w-full border border-slate-200 hover:bg-slate-50 active:scale-[0.98]
-                text-slate-500 py-2 rounded-xl text-xs font-medium transition-all"
+              className="w-full border border-cream bg-sand hover:bg-sand/80 active:scale-[0.98] text-charcoal py-2 rounded-xl text-xs font-medium transition-all"
             >
               View Last Quiz Results
             </button>
@@ -53,6 +53,7 @@ export default function QuizPage() {
           analyses={analyses}
           analyzing={analyzing}
           wrongAttemptIds={wrongAttemptIds}
+          wrongAnswers={wrongAnswers}
           onRetry={reset}
         />
       )}

@@ -1,6 +1,14 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { api } from "../api/client";
-import type { AnalysisItem } from "../types";
+import type { AnalysisItem, VideoTutorialSet } from "../types";
+import YouTubeCard from "./YouTubeCard";
+
+interface WrongAnswer {
+  question: string;
+  correct_answer: string;
+  user_answer: string;
+  concepts: string[];
+}
 
 interface Props {
   score: number;
@@ -8,16 +16,19 @@ interface Props {
   analyses: AnalysisItem[];
   analyzing: boolean;
   wrongAttemptIds: number[];
+  wrongAnswers?: WrongAnswer[];
   onRetry: () => void;
 }
 
 export default function QuizResults({
-  score, total, analyses, analyzing, wrongAttemptIds, onRetry,
+  score, total, analyses, analyzing, wrongAttemptIds, wrongAnswers = [], onRetry,
 }: Props) {
   const pct = total > 0 ? Math.round((score / total) * 100) : 0;
   const wrong = total - score;
   const [explanations, setExplanations] = useState<Record<number, string>>({});
   const [generating, setGenerating] = useState<Record<number, boolean>>({});
+  const [ytRecs, setYtRecs] = useState<VideoTutorialSet[] | null>(null);
+  const [ytLoading, setYtLoading] = useState(false);
 
   const handleGenerate = async (index: number) => {
     const attemptId = wrongAttemptIds[index];
@@ -30,6 +41,19 @@ export default function QuizResults({
       setGenerating(g => ({ ...g, [index]: false }));
     }
   };
+
+  const loadTutorials = useCallback(async () => {
+    if (wrongAnswers.length === 0) return;
+    setYtLoading(true);
+    try {
+      const res = await api.getRecsForWrongAnswers(wrongAnswers);
+      setYtRecs(res.recommendations);
+    } catch {
+      setYtRecs([]);
+    } finally {
+      setYtLoading(false);
+    }
+  }, [wrongAnswers]);
 
   return (
     <div className="space-y-5 animate-fade-in">
@@ -115,6 +139,46 @@ export default function QuizResults({
               );
             })
           )}
+        </div>
+      )}
+
+      {/* YouTube Tutorial Recommendations */}
+      {wrong > 0 && wrongAnswers.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-ash uppercase tracking-wide">Tutorial Videos</p>
+            {ytRecs === null && !ytLoading && (
+              <button
+                onClick={loadTutorials}
+                className="text-xs text-brand-500 font-semibold hover:underline"
+              >
+                Find tutorials →
+              </button>
+            )}
+          </div>
+
+          {ytLoading && (
+            <div className="h-32 bg-sand rounded-2xl animate-timer-pulse" />
+          )}
+
+          {ytRecs !== null && ytRecs.length === 0 && (
+            <p className="text-xs text-ash italic">No tutorials found. Try again later.</p>
+          )}
+
+          {ytRecs && ytRecs.map((rec, i) => (
+            <div key={i} className="space-y-2 animate-fade-in" style={{ animationDelay: `${i * 80}ms` }}>
+              {rec.concepts.length > 0 && (
+                <p className="text-xs font-medium text-bark">
+                  {rec.concepts.join(" · ")}
+                </p>
+              )}
+              <div className="grid grid-cols-2 gap-2">
+                {rec.videos.map((v, j) => (
+                  <YouTubeCard key={j} video={v} delay={j * 100} />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

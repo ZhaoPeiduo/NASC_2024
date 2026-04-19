@@ -187,11 +187,21 @@ export function useQuizMode() {
   const timerWarning = timeLimitSec > 0 && timeLeft < 60;
   const timerCritical = timeLimitSec > 0 && timeLeft < 30;
 
+  const wrongAnswers = answers
+    .filter(a => !a.isCorrect)
+    .map(a => ({
+      question: a.question,
+      correct_answer: a.correctAnswer,
+      user_answer: a.userAnswer,
+      concepts: [] as string[],
+    }));
+
   return {
     screen, questions, current, selected, setSelected,
     answers, timeLeft, timeLimitSec, analyses, analyzing,
     wrongAttemptIds,
     score, timerWarning, timerCritical,
     startQuiz, confirmAnswer, reset, restoreResults,
+    wrongAnswers,
   };
 }
