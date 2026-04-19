@@ -180,3 +180,7 @@ class TikTokVideoMeta(BaseModel):
     video_id: str
     title: str
     author: str
+
+
+class OcrBatchResponse(BaseModel):
+    questions: list[PracticeQuestion]
