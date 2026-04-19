@@ -71,3 +71,9 @@ export interface VideoTutorialSet {
 export interface WrongAnswerRecsResponse {
   recommendations: VideoTutorialSet[];
 }
+
+export interface TikTokVideoMeta {
+  video_id: string;
+  title: string;
+  author: string;
+}

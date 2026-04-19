@@ -157,4 +157,9 @@ export const api = {
     get<import("../types").VideoRecommendation>(
       `/api/v1/youtube/random-song${concept ? `?concept=${encodeURIComponent(concept)}` : ""}`
     ),
+
+  getRandomTikTok: (topic?: string) =>
+    get<import("../types").TikTokVideoMeta>(
+      `/api/v1/tiktok/random-video${topic ? `?topic=${encodeURIComponent(topic)}` : ""}`
+    ),
 };
