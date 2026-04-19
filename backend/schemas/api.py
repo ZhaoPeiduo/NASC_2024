@@ -152,3 +152,25 @@ class MediaRecommendResponse(BaseModel):
     songs: list[SongRec]
     anime: list[AnimeRec]
     articles: list[ArticleRec]
+
+
+class WrongItemRec(BaseModel):
+    question: str
+    correct_answer: str
+    user_answer: str
+    concepts: list[str] = []
+
+
+class WrongAnswerRecsRequest(BaseModel):
+    wrong_items: list[WrongItemRec]
+
+
+class VideoTutorialSet(BaseModel):
+    question_snippet: str
+    concepts: list[str]
+    search_query: str
+    videos: list[VideoRecommendation]
+
+
+class WrongAnswerRecsResponse(BaseModel):
+    recommendations: list[VideoTutorialSet]
