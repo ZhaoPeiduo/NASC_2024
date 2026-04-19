@@ -6,6 +6,7 @@ import AskPage from "./pages/AskPage";
 import HistoryPage from "./pages/HistoryPage";
 import StatsPage from "./pages/StatsPage";
 import QuizPage from "./pages/QuizPage";
+import DiscoverPage from "./pages/DiscoverPage";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/quiz" element={<Layout><QuizPage /></Layout>} />
           <Route path="/history" element={<Layout><HistoryPage /></Layout>} />
           <Route path="/stats" element={<Layout><StatsPage /></Layout>} />
+          <Route path="/discover" element={<Layout><DiscoverPage /></Layout>} />
           <Route path="*" element={<Navigate to="/ask" replace />} />
         </Routes>
       </AuthProvider>

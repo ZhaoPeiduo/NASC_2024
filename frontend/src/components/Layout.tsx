@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { to: "/quiz",     label: "Quiz" },
   { to: "/history",  label: "History" },
   { to: "/stats",    label: "Stats" },
+  { to: "/discover", label: "Discover" },
 ];
 
 export default function Layout({ children }: { children: ReactNode }) {
