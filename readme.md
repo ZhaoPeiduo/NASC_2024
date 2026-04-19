@@ -1,81 +1,74 @@
-## LLM Sensei: Leveraging Large Language Model (LLM) to explain multiple-choice questions for JLPT preparation
+# JLPT Sensei
 
-By Team LLMers: Cao Han, Zhao Peiduo
+AI-powered JLPT Japanese grammar prep — ask questions, take timed quizzes, review mistakes, and discover Japanese content.
 
-![Demo](./static/demo.jpg)
+## Features
 
-This repository contains the model and user interface for LLM Sensei as the entry for National AI Student Challenge 2024, which has been selected as one of the finalist projects.
+- **Ask** — paste a grammar question, get an AI explanation of every option
+- **Quiz** — timed quiz mode with three ways to build a question set: upload CSV, scan screenshots (OCR), or generate with AI (choose JLPT level + concept)
+- **History** — browse past attempts, filter by wrong answers
+- **Stats** — accuracy, study streak, weak concepts with one-click quiz generation
+- **Discover** — hit "Hit Me" to get a random Japanese YouTube video or TikTok, filtered by topic
 
-### Objective
+## Stack
 
-LLM Sensei aims to generate answers and explanations for the input Japanese grammar questions, by using pretrained Japanese LLM and prompt engineering to obtain the desired output from the model.
+| Layer | Technology |
+|-------|-----------|
+| Backend | FastAPI, SQLAlchemy 2.0 async, aiosqlite |
+| LLM | OpenRouter (default) or local HuggingFace model |
+| Frontend | React 18, Vite 5, TypeScript, Tailwind CSS v4 |
+| Database | SQLite (dev) — swap to PostgreSQL via `DATABASE_URL` |
 
-### Requirements and Quick Start
+## Quick Start
 
-This solution was written in Python 3.8.10, tested on a laptop with RTX4080 GPU, and will work optimally for other devices with compatible GPU resources.
+### Backend
 
-To install the dependencies, you may want to create a virtual environement (using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) for instance) and simply run: 
-
+```bash
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r backend/requirements/base.txt
+python -m playwright install chromium               # for TikTok integration
+cp .env.example .env                                # fill in keys
+uvicorn backend.main:app --reload --app-dir .
+# API at http://127.0.0.1:8000  |  Swagger at http://127.0.0.1:8000/docs
 ```
-pip install -r requirements.txt
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev    # http://localhost:5173
 ```
 
-To run the application, use the following command:
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OPENROUTER_API_KEY` | Yes | OpenRouter API key |
+| `OPENROUTER_MODEL` | No | Model ID (default: `openai/gpt-4o-mini`) |
+| `SECRET_KEY` | Yes (prod) | JWT signing secret |
+| `DATABASE_URL` | No | SQLAlchemy URL (default: SQLite) |
+| `YOUTUBE_API_KEY` | No | YouTube Data API v3 key — Discover YouTube feature |
+| `TIKTOK_MS_TOKEN` | No | TikTok `msToken` cookie — Discover TikTok feature |
+
+Both `YOUTUBE_API_KEY` and `TIKTOK_MS_TOKEN` are optional. The respective Discover sources show an empty state when not configured.
+
+## TikTok Setup
+
+The TikTok integration uses the unofficial [TikTok-Api](https://github.com/davidteather/TikTok-api) library (Playwright-based). After installing dependencies:
+
+```bash
+python -m playwright install chromium
 ```
-uvicorn backend:app --reload
+
+To get your `msToken`, log into TikTok in a browser and copy the `msToken` cookie value into `.env`.
+
+## Tests
+
+```bash
+# Unit + integration (no server needed)
+python -m pytest tests/ -v --ignore=tests/test_e2e_smoke.py
+
+# E2E smoke (backend must be running)
+python -m pytest tests/test_e2e_smoke.py -v
 ```
-
-and open the corresponding localhost as indicated by the logging INFO (the default should be http://127.0.0.1:8000).
-
-### Frontend (React) UI
-
-- The app now ships a single-page React UI embedded directly in `frontend.html` (React via CDNs; no build step required).
-- FastAPI serves `frontend.html` from `GET /` using Jinja2, so the above `uvicorn` command is sufficient.
-- Live progress updates stream over a WebSocket at `/ws`. The UI shows:
-  - Percentage: normalized to 0–100 based on backend progress values.
-  - Phases: Idle → Answering → Explaining → Done.
-  - Step chips to make the current phase obvious.
-
-#### Using the app
-- Enter a question and up to four options, then click Submit.
-- Or upload an image, draw a rectangle around the question and options, and click Extract Text to auto-fill.
-- The model’s selected answer and explanation will populate once ready; the progress UI updates live.
-
-### Workflow
-
-The workflow of LLM sensei is represented by the following flow chart:
-
-![Workflow](./static/workflow.png)
-
-### Model Specification
-
-After comparing three candidate models, japanese-stablelm-instruct-gamma-7b by stabilityai with half precision is chosen as the LLM backend for this project.
-
-The half-precision model is able to fit within a laptop RTX4080 GPU, occupying approximately 11GB of GPU memory. 
-
-Dataset used for evaluation and other candidate models can be found under the Evaluation directory. 
-
-### Prompt Engineering Methodology
-
-The strategy is to use multi-step prompting 
-1. Appplying context specification by stating that the LLM should act as a Japanese teacher. 
-
-2. Provide clear instruction for the LLM to indicate the correct answer clearly.
-
-3. Applying the chain-of-thought:
-- Firstly, ask the LLM to make a choice among available option;
-- Secondly, based on the previous answer, ask the LLM to explain the choice.
-
-### API Endpoints (for reference)
-- `GET /`: Serves the React UI.
-- `WS /ws`: Pushes progress updates as `{ progress: int, reset?: 1 }`.
-- `POST /reterieve_answer`: Body `{ question, option1, option2, option3, option4 }` → returns model answer.
-- `POST /retrieve_explanation`: Body `{ question, option1, option2, option3, option4, answer }` → returns explanation.
-- `POST /extract-text/`: FormData `{ image_data, x1, y1, x2, y2, num_options }` → returns OCR-derived question/options.
-
-Notes:
-- The backend currently increments progress in steps totaling ~80; the UI normalizes to 100% for clarity.
-- For more precise phase control, the backend can emit explicit phase labels; the current UI infers them from progress.
-
-### Poster
-![Poster](./static/poster.jpg)
