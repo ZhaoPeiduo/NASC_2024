@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     # YouTube
     youtube_api_key: str = ""
 
+    # TikTok
+    tiktok_ms_token: str = ""
+
     # CORS
     allowed_origins: list[str] = ["http://localhost:5173"]
 
