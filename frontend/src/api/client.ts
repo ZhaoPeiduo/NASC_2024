@@ -162,4 +162,17 @@ export const api = {
     get<import("../types").TikTokVideoMeta>(
       `/api/v1/tiktok/random-video${topic ? `?topic=${encodeURIComponent(topic)}` : ""}`
     ),
+
+  uploadOcrImages: (images: File[]) => {
+    const form = new FormData();
+    images.forEach(f => form.append("images", f));
+    return fetch(`${BASE}/api/v1/quiz/ocr/batch`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: form,
+    }).then(async r => {
+      if (!r.ok) { const e = await r.json().catch(() => ({ detail: "OCR failed" })); throw new Error(e.detail); }
+      return r.json() as Promise<{ questions: import("../types").QuizQuestion[] }>;
+    });
+  },
 };
