@@ -3,11 +3,11 @@ import { NavLink, Navigate } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContext";
 
 const NAV_ITEMS = [
+  { to: "/discover", label: "Discover" },
   { to: "/ask",      label: "Ask" },
   { to: "/quiz",     label: "Quiz" },
   { to: "/history",  label: "History" },
   { to: "/stats",    label: "Stats" },
-  { to: "/discover", label: "Discover" },
 ];
 
 export default function Layout({ children }: { children: ReactNode }) {

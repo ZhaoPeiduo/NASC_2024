@@ -20,7 +20,7 @@ export default function App() {
           <Route path="/history" element={<Layout><HistoryPage /></Layout>} />
           <Route path="/stats" element={<Layout><StatsPage /></Layout>} />
           <Route path="/discover" element={<Layout><DiscoverPage /></Layout>} />
-          <Route path="*" element={<Navigate to="/ask" replace />} />
+          <Route path="*" element={<Navigate to="/discover" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
