@@ -140,4 +140,21 @@ export const api = {
       { concept },
       true
     ),
+
+  getRecsForWrongAnswers: (wrongItems: {
+    question: string;
+    correct_answer: string;
+    user_answer: string;
+    concepts: string[];
+  }[]) =>
+    post<import("../types").WrongAnswerRecsResponse>(
+      "/api/v1/recommendations/for-wrong-answers",
+      { wrong_items: wrongItems },
+      true
+    ),
+
+  getRandomSong: (concept?: string) =>
+    get<import("../types").VideoRecommendation>(
+      `/api/v1/youtube/random-song${concept ? `?concept=${encodeURIComponent(concept)}` : ""}`
+    ),
 };

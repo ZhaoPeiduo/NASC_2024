@@ -60,3 +60,14 @@ export interface MediaRecommendResponse {
   anime: { title: string; scene: string }[];
   articles: { title: string; keywords: string }[];
 }
+
+export interface VideoTutorialSet {
+  question_snippet: string;
+  concepts: string[];
+  search_query: string;
+  videos: VideoRecommendation[];
+}
+
+export interface WrongAnswerRecsResponse {
+  recommendations: VideoTutorialSet[];
+}
